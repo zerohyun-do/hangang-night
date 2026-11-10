@@ -2575,6 +2575,7 @@ function showEndAsk() {
 let showAsked = -1;
 function storyHint() {   // 📖 열두 밤: 다음 화가 열렸으면 알려 준다. 처음 온 사람에겐 한 번만 소개
   let S = null, seen = 0; try { S = JSON.parse(localStorage.getItem("hn-story") || "null"); seen = +localStorage.getItem("hn-story-hint") || 0; } catch {}
+  if (S && S.nx && S.nxa !== S.ep) { const op = S.ep <= 12 && Date.now() >= (S.at || 0); try { S.nxa = S.ep; localStorage.setItem("hn-story", JSON.stringify(S)); } catch {} return toast(`💬 ${S.nx}` + (op ? ` · 📖 ${S.ep}화 열림` : ""), 6500); }   // 그 사람의 한 줄(열두 밤이 저장)
   if (S && S.ep >= 2 && S.ep <= 12 && Date.now() >= (S.at || 0)) return toast(`📖 열두 밤 ${S.ep}화가 열렸어요 · ☰ 더보기 → 열두 밤`, 4200);
   if (!S && !seen) { try { localStorage.setItem("hn-story-hint", "1"); } catch {} toast("📖 새 이야기 「한강, 열두 밤」 · ☰ 더보기에서 볼 수 있어요", 4200); }
 }

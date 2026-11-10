@@ -32,24 +32,27 @@ window.HNChar = (() => {
   };
   function eyes(c, m, g) {
     const L = 86, R = 124, Y = 114;
-    const brow = (x, f) => m === "d" ? `<path d="M${x - 9 * f} ${Y - 20} L${x + 8 * f} ${Y - 25}" stroke="${c.hair}" stroke-width="2.6" stroke-linecap="round"/>` : `<path d="M${x - 9} ${Y - 21 - (m === "o" ? 4 : 0)} Q${x} ${Y - 26 - (m === "o" ? 4 : 0)} ${x + 9} ${Y - 22 - (m === "o" ? 4 : 0)}" stroke="${c.hair}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
-    if (m === "s") return [L, R].map((x, i) => `<path d="M${x - 10} ${Y + 2} Q${x} ${Y - 9} ${x + 10} ${Y + 2}" stroke="#2a1d26" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M${x + (i ? 10 : -10)} ${Y + 1} l${i ? 4 : -4} -2" stroke="#2a1d26" stroke-width="2.4" stroke-linecap="round"/>` + brow(x, i ? -1 : 1)).join("");
-    const h = m === "o" ? 16 : m === "d" ? 12 : 14;
-    const one = (x, f) => `<ellipse cx="${x}" cy="${Y}" rx="11" ry="${h}" fill="#fff"/><ellipse cx="${x + f * .5}" cy="${Y + 1.5}" rx="8.6" ry="${h - 1.2}" fill="url(#${g}i)"/><ellipse cx="${x + f * .5}" cy="${Y + 1}" rx="4.2" ry="${h - 6}" fill="#160f18"/><ellipse cx="${x - 3}" cy="${Y - 5}" rx="3.6" ry="4.2" fill="#fff"/><circle cx="${x + 3.6}" cy="${Y + 6}" r="1.7" fill="#fff" opacity=".9"/><path d="M${x - 12} ${Y - h + 5} Q${x - 2} ${Y - h - 5} ${x + 12} ${Y - h + 3}" stroke="#1d141c" stroke-width="3.8" fill="none" stroke-linecap="round"/><path d="M${x + f * 11} ${Y - h + 4} l${f * 5} -3 M${x + f * 12} ${Y - h + 8} l${f * 4} -1" stroke="#1d141c" stroke-width="2.2" stroke-linecap="round"/><path d="M${x - 6} ${Y + h + 1} Q${x} ${Y + h + 3} ${x + 6} ${Y + h + 1}" stroke="${c.sh}" stroke-width="1.6" fill="none" stroke-linecap="round"/>` + brow(x, -f);
-    return one(L, -1) + one(R, 1);
+    const brow = (x, f) => m === "p" ? `<path d="M${x - 9 * f} ${Y - 26} L${x + 8 * f} ${Y - 21}" stroke="${c.hair}" stroke-width="2.8" stroke-linecap="round"/>` : m === "e" ? `<path d="M${x - 9} ${Y - 23} L${x + 9} ${Y - 23}" stroke="${c.hair}" stroke-width="2.8" stroke-linecap="round"/>` : m === "d" ? `<path d="M${x - 9 * f} ${Y - 20} L${x + 8 * f} ${Y - 25}" stroke="${c.hair}" stroke-width="2.6" stroke-linecap="round"/>` : `<path d="M${x - 9} ${Y - 21 - (m === "o" ? 4 : 0)} Q${x} ${Y - 26 - (m === "o" ? 4 : 0)} ${x + 9} ${Y - 22 - (m === "o" ? 4 : 0)}" stroke="${c.hair}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+    if (m === "s" || m === "c") return [L, R].map((x, i) => `<path d="M${x - 10} ${Y + 2} Q${x} ${Y - 9} ${x + 10} ${Y + 2}" stroke="#2a1d26" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M${x + (i ? 10 : -10)} ${Y + 1} l${i ? 4 : -4} -2" stroke="#2a1d26" stroke-width="2.4" stroke-linecap="round"/>` + brow(x, i ? -1 : 1)).join("");
+    const h = m === "o" ? 16 : m === "d" || m === "p" || m === "e" ? 12 : 14;
+    const one = (x, f) => `<ellipse cx="${x}" cy="${Y}" rx="11" ry="${h}" fill="#fff"/><ellipse cx="${x + f * .5}" cy="${Y + 1.5}" rx="8.6" ry="${h - 1.2}" fill="url(#${g}i)"/><ellipse cx="${x + f * .5}" cy="${Y + 1}" rx="4.2" ry="${h - 6}" fill="#160f18"/><ellipse cx="${x - 3}" cy="${Y - 5}" rx="3.6" ry="4.2" fill="#fff"/><circle cx="${x + 3.6}" cy="${Y + 6}" r="1.7" fill="#fff" opacity=".9"/><path d="M${x - 12} ${Y - h + 5} Q${x - 2} ${Y - h - 5} ${x + 12} ${Y - h + 3}" stroke="#1d141c" stroke-width="3.8" fill="none" stroke-linecap="round"/><path d="M${x + f * 11} ${Y - h + 4} l${f * 5} -3 M${x + f * 12} ${Y - h + 8} l${f * 4} -1" stroke="#1d141c" stroke-width="2.2" stroke-linecap="round"/><path d="M${x - 6} ${Y + h + 1} Q${x} ${Y + h + 3} ${x + 6} ${Y + h + 1}" stroke="${c.sh}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+    return `<g class="ey">${one(L, -1) + one(R, 1)}</g>` + brow(L, 1) + brow(R, -1);
   }
-  function mouth(m) {
-    if (m === "s") return `<path d="M95 138 Q105 150 115 138 Q105 142 95 138 Z" fill="#c4504f"/><path d="M99 141 Q105 146 111 141" fill="#ff8a8a"/>`;
+  function mouth(m) { return `<g class="mo">${mouth0(m)}</g><g class="mt"><ellipse cx="105" cy="141" rx="4.2" ry="4.4" fill="#a8403f"/><ellipse cx="105" cy="143.2" rx="2.4" ry="1.6" fill="#ff8a8a"/></g>`; }
+  function mouth0(m) {
+    if (m === "p") return `<path d="M99 141 q3 -3.5 6 0 q3 3.5 6 0" stroke="#a8403f" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    if (m === "e") return `<path d="M100 141 L110 141" stroke="#a8403f" stroke-width="2.4" stroke-linecap="round"/>`;
+    if (m === "s" || m === "c") return `<path d="M95 138 Q105 150 115 138 Q105 142 95 138 Z" fill="#c4504f"/><path d="M99 141 Q105 146 111 141" fill="#ff8a8a"/>`;
     if (m === "o") return `<ellipse cx="105" cy="142" rx="4.5" ry="5.5" fill="#a8403f"/><ellipse cx="105" cy="144.5" rx="2.6" ry="2" fill="#ff8a8a"/>`;
     if (m === "d") return `<path d="M98 143 Q105 138 112 143" stroke="#a8403f" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
-    if (m === "b") return `<path d="M100 141 Q103 139 105 141 Q107 139 110 141" stroke="#a8403f" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    if (m === "b") return `<path d="M100 140 Q105 144.5 110 140" stroke="#a8403f" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
     return `<path d="M98 139 Q105 145 112 139" stroke="#a8403f" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
   }
   function face(k, m = "n") {
     const c = P[k], g = "hc" + k + (++uid);
-    const blushO = m === "b" ? .6 : m === "s" ? .4 : .2;
+    const blushO = m === "b" ? .6 : m === "s" || m === "c" || m === "p" ? .45 : .2;
     const blush = `<ellipse cx="78" cy="131" rx="11" ry="5.5" fill="#ff7f8a" opacity="${blushO}"/><ellipse cx="132" cy="131" rx="11" ry="5.5" fill="#ff7f8a" opacity="${blushO}"/>` + (m === "b" ? `<path d="M71 129 l4 -4 M77 130 l4 -4 M83 130 l4 -4 M127 130 l4 -4 M133 130 l4 -4 M139 129 l4 -4" stroke="#e05a6a" stroke-width="1.5" stroke-linecap="round"/>` : "");
-    const tear = m === "d" ? `<path d="M80 128 q-3 7 0 10 q3 -3 0 -10" fill="#9fd8ff"/>` : "";
+    const tear = m === "c" ? `<path d="M73 118 q-3 7 0 10 q3 -3 0 -10 M137 118 q-3 7 0 10 q3 -3 0 -10" fill="#9fd8ff"/>` : m === "p" ? `<ellipse cx="136" cy="132" rx="9" ry="7" fill="#fff" opacity=".18"/>` : m === "d" ? `<path d="M80 128 q-3 7 0 10 q3 -3 0 -10" fill="#9fd8ff"/>` : "";
     const sweat = m === "o" ? `<path d="M150 80 q-4 7 0 10 q4 -3 0 -10" fill="#bfe6ff"/>` : "";
     return `<svg viewBox="0 0 210 232" xmlns="http://www.w3.org/2000/svg"><defs>
 <linearGradient id="${g}i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d141c"/><stop offset=".45" stop-color="${c.eye}"/><stop offset="1" stop-color="${c.eye2}"/></linearGradient>
@@ -84,20 +87,20 @@ ${extra[k](c)}${sweat}</svg>`;
     "n:그리고 자전거 한 대가 천천히 내 앞을 지나간다.",
     "h:어, 거기 돗자리 끈 풀렸어요!",
     "n:바람에 돗자리 끝이 펄럭인다.",
-    ["?", ["앗, 감사해요!", { h: 5 }, "h:바람 세죠? 꽉 묶어요!"], ["(말없이 고개만 끄덕인다)", { h: 2 }, "n:그 사람은 손을 한 번 흔들고 멀어졌다."], ["알아요, 일부러 그런 거예요.", { h: 8 }, "h:ㅋㅋ 바람이랑 싸우는 중이었구나. 이겨요!"]],
+    ["?", ["앗, 감사해요!", { h: 5 }, "h:바람 세죠? 꽉 묶어요!", "h1=고맙다고 웃어 줬죠"], ["(말없이 고개만 끄덕인다)", { h: 2 }, "n:그 사람은 손을 한 번 흔들고 멀어졌다.", "h1=말없이 고개만 끄덕였죠"], ["알아요, 일부러 그런 거예요.", { h: 8 }, "h:ㅋㅋ 바람이랑 싸우는 중이었구나. 이겨요!", "h1=바람이랑 일부러 싸우는 중이라고 했죠"]],
     "@store|23:05 · 편의점",
     "n:따뜻한 게 먹고 싶어서 편의점에 들어갔다.",
     "d:…라면이면 저쪽에서 물 받으시면 돼요.",
     "n:컵라면을 고르는데, 계산대의 그 사람이 내 손에 든 걸 힐끔 본다.",
     "d:그거 매워요. 오늘 같은 날은 이게 나아요.",
     "n:그 사람이 다른 라면 하나를 계산대 위에 올려놓는다.",
-    ["?", ["그럼 추천해주신 걸로요.", { d: 8 }, "d:…물은 선까지만 받으세요. 그게 제일 맛있어요."], ["매운 거 좋아해요.", { d: 2 }, "d:…우유는 저기 있어요."], ["둘 다 살게요.", { d: 5 }, "d:(아주 잠깐 웃은 것 같다) 2,700원이요."]],
+    ["?", ["그럼 추천해주신 걸로요.", { d: 8 }, "d:…물은 선까지만 받으세요. 그게 제일 맛있어요.", "d1=제가 골라 준 라면을 그냥 믿고 사 갔죠"], ["매운 거 좋아해요.", { d: 2 }, "d:…우유는 저기 있어요.", "d1=매운 거 좋아한다고 끝까지 우겼죠"], ["둘 다 살게요.", { d: 5 }, "d:(아주 잠깐 웃은 것 같다) 2,700원이요.", "d1=라면 두 개를 다 사 갔죠"]],
     "@stage|23:24 · 물빛무대",
     "n:라면을 들고 돌아오는 길, 아까 그 기타 소리의 주인이 보인다.",
     "n:관객은 아무도 없다. 그래도 그 사람은 노래를 멈추지 않는다.",
     "n:마지막 소절이 끝나고, 그 사람이 처음으로 고개를 든다.",
     "s:…계속 서 계셨어요?",
-    ["?", ["노래가 좋아서요.", { s: 8 }, "s:…그 말, 오늘 처음 들어요."], ["관객이 없길래 한 명 채워드렸어요.", { s: 5 }, "s:고마운 건지 모르겠네. …고마워요."], ["(말없이 박수를 친다)", { s: 6 }, "n:그 사람이 기타 넥을 쥔 채 꾸벅 고개를 숙였다."]],
+    ["?", ["노래가 좋아서요.", { s: 8 }, "s:…그 말, 오늘 처음 들어요.", "s1=노래가 좋아서 서 있었다고 했죠"], ["관객이 없길래 한 명 채워드렸어요.", { s: 5 }, "s:고마운 건지 모르겠네. …고마워요.", "s1=관객 한 명 채워 주러 왔다고 했죠"], ["(말없이 박수를 친다)", { s: 6 }, "n:그 사람이 기타 넥을 쥔 채 꾸벅 고개를 숙였다.", "s1=아무 말 없이 박수만 쳐 줬죠"]],
     "@river|23:58 · 내 돗자리",
     "n:돗자리로 돌아와 누웠다. 별이 몇 개 보인다.",
     "n:오늘 밤, 가장 마음에 남은 사람은…",
@@ -112,7 +115,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:어제와 같은 자리. 관객은 여전히 나 하나.",
         "c:…또 왔네요.",
         "c:어제 그 관객. 오늘은 신청곡 받아요. 한 곡만.",
-        ["?", ["오늘 제일 부르고 싶은 노래요.", 8, "c:…그런 신청은 처음인데. 그럼 내 노래 할게요. 아무도 모르는 거."], ["밤에 어울리는 노래요.", 5, "c:밤이야 다 어울리죠. 알겠어요."], ["아무거나요.", 2, "c:아무거나가 제일 어려운 거 알아요?"]],
+        ["?", ["오늘 제일 부르고 싶은 노래요.", 8, "c:…그런 신청은 처음인데. 그럼 내 노래 할게요. 아무도 모르는 거.", "s2=제일 부르고 싶은 노래를 신청해 줬죠"], ["밤에 어울리는 노래요.", 5, "c:밤이야 다 어울리죠. 알겠어요.", "s2=밤에 어울리는 노래를 신청했죠"], ["아무거나요.", 2, "c:아무거나가 제일 어려운 거 알아요?", "s2=아무거나 불러 달라고 했죠"]],
         "n:노래가 시작되자 강바람이 잠깐 멈춘 것 같았다.",
         "n:노래가 끝나고 그 사람이 기타 케이스를 연다. 안에는 동전 몇 개뿐이다.",
         ["?", ["(케이스에 천 원을 넣는다)", 5, "c:…이러면 내일도 부르러 나와야 하잖아요."], ["내일도 여기서 해요?", 8, "c:비만 안 오면요. 비 와도 할 수도 있고."]],
@@ -124,6 +127,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:앰프는 생각보다 무거워 보인다.",
         ["?", ["제가 하나 들어드릴게요.", 8, "c:…앰프는 무거운데. 그럼 이 보면대만요."], ["(조금 떨어져서 기다린다)", 5, "c:…왜 아직 안 갔어요?"]],
         "n:주차장까지 걷는 짧은 길. 기타 케이스에 스티커가 잔뜩 붙어 있다.",
+        "n:스티커 사이에 접힌 종이 한 장. 오디션 접수증이다. 번호 옆에 손글씨로 '12'.",
         "c:서윤이에요. 이름. 매일 오는 사람한테 계속 '저기요' 하기 이상해서.",
         "y:…저는 매일 오는 사람이에요.",
         "c:(처음으로 소리 내서 웃는다) 그건 알아요.",
@@ -150,7 +154,7 @@ ${extra[k](c)}${sweat}</svg>`;
         ["?", ["당연하죠. 맨 앞자리 맡아둘게요.", 8, "c:맨 앞자리라고 해봐야 한 자리지만. …좋아요."], ["노력해볼게요.", 2, "c:노력… 그래요. 와주면 좋고."], ["제목이 뭔데요?", 5, "c:그건 내일 알려줄게요. 와야 알 수 있어요."]],
         "n:서윤이 피크 하나를 손바닥에 올려준다. 노란색, 끝이 조금 닳았다.",
         "c:약속 보증금. 내일 와서 돌려줘요.",
-        ["?", ["(피크를 꼭 쥔다) 잃어버리면 안 되겠다.", 8, "c:잃어버리면 노래 한 곡 빚지는 걸로."], ["이거 아끼는 거 아니에요?", 5, "c:제일 아끼는 거라서 주는 거예요."]],
+        ["?", ["(피크를 꼭 쥔다) 잃어버리면 안 되겠다.", 8, "c:잃어버리면 노래 한 곡 빚지는 걸로.", "s5=피크를 꼭 쥐고 잃어버리면 안 되겠다고 했죠"], ["이거 아끼는 거 아니에요?", 5, "c:제일 아끼는 거라서 주는 거예요.", "s5=제일 아끼는 거 아니냐고 물었죠"]],
         "n:집에 오는 내내 주머니 속 피크를 만지작거렸다.",
       ] },
       { t: "오해한 밤", L: [
@@ -171,15 +175,18 @@ ${extra[k](c)}${sweat}</svg>`;
         "c:이번에도 안 되면 그만두려고요. 그래서 요즘 매일 나와요. 마지막일지 몰라서.",
         ["?", ["그만두지 마요. 저 아직 다 못 들었어요.", 8, "c:…그런 이유로 계속하는 사람도 있을까요."], ["왜 하필 한강에서 불러요?", 5, "c:아빠가 여기서 처음 기타 가르쳐줬어요. 저 계단에서."]],
         "c:아빠가 그랬어요. 한 명이라도 듣고 있으면 끝까지 부르라고.",
+        "c:{d}아빠는 제 첫 공연을 못 봤어요. 그 전에 아파서. 그래서 한 명만 있어도 끝까지 불러요. 그 한 명이 아빠일 수도 있으니까.",
         "c:요즘은 그 한 명이 매일 와서… 좀 반칙이에요.",
         ["?", ["반칙이어도 계속 올 거예요.", 8, "c:(고개를 숙이고 한참 웃는다) 진짜 반칙이다."], ["아버지도 노래 들으시면 좋아하실 거예요.", 5, "c:…그랬으면 좋겠다."]],
         "n:강 건너 불빛이 서윤의 젖은 눈가에 번졌다.",
+        "c:{c}이 얘기, 누구한테 처음 해 봐요. 이상하다. 말하고 나니까 가벼워요.",
       ] },
       { t: "정각 불꽃놀이", L: [
         "@fire|00:00 · 물빛무대",
         "n:자정. 하늘에서 불꽃이 터지기 시작했다.",
         "n:서윤은 노래를 멈추고 나란히 서서 하늘을 봤다.",
         "c:새 곡 제목, 알려줄까요.",
+        "@cu",
         "c:'열두 밤'. 처음 관객 생긴 날부터 세고 있었어요.",
         ["?", ["오늘이 몇 번째 밤인데요?", 8, "c:여덟 번째. …관객님 오고 나서부터만 셌어요."], ["좋은 제목이에요.", 5, "c:가사는 더 좋아요. 아직 못 들려주는 부분이 있어서 그렇지."]],
         "n:마지막 불꽃이 길게 꼬리를 끌며 강물로 떨어졌다.",
@@ -193,6 +200,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:돌아가려는데 무대 옆 계단에 뭔가 반짝인다.",
         "n:노란 피크. 내가 돌려준 그 피크다. 밑에 작은 종이가 깔려 있다.",
         "n:'오디션 연습 가요. 오늘 못 불러서 미안해요. 이거 다시 맡아줘요. — 서윤'",
+        "n:종이 귀퉁이에 지웠다 다시 쓴 자국이 있다. '사실 무서워요. 이번이 진짜 마지막이라서.'",
         ["?", ["(피크를 주머니에 넣는다)", 8, "n:피크가 이상하게 따뜻했다."], ["(종이 뒤에 답장을 쓴다)", 5, "n:'잘하고 와요. 맨 앞자리 비워둘게요.'"]],
       ] },
       { t: "용기 내는 밤", L: [
@@ -201,6 +209,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "c:오디션 망친 것 같아요. 첫 소절에서 목이 잠겼어요.",
         "c:모르는 사람들 앞에선 안 되나 봐요. 여기선 되는데.",
         ["?", ["여기서 지금 불러봐요. 제가 심사위원 할게요.", 8, "c:…심사위원님 표정이 너무 다정해서 실격이에요."], ["아직 결과 안 나왔잖아요.", 5, "c:그쵸. 아직이죠."]],
+        "?s2>c:두 번째 밤에 {s2}. 그래서 오늘은 이 노래예요.",
         "n:서윤이 기타를 꺼내 '열두 밤'을 처음부터 끝까지 불렀다.",
         "n:지난번엔 비어 있던 마지막 구절이 채워져 있었다.",
         "n:'매일 같은 자리에 앉아준 너에게, 열두 번째 밤엔 말할게'",
@@ -212,6 +221,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "c:내일 오디션 결과 나와요. 밤 10시에.",
         "c:혼자 보기 무서워서요. …같이 봐줄래요? 여기서.",
         ["?", ["당연하죠. 어떤 결과든 옆에 있을게요.", 8, "c:어떤 결과든… 그 말 믿을게요."], ["붙을 거예요. 축하 준비해 올게요.", 5, "c:떨어지면 축하 대신 라면 사줘요."]],
+        "?s5>c:피크 줬던 날, {s5}. 그 피크, 내일 꼭 가져와요.",
         "c:그리고 내일, 할 말 있어요. 결과랑 상관없이.",
         "n:서윤이 손가락으로 계단에 숫자를 쓴다. 12.",
         ["?", ["저도 할 말 있어요.", 8, "c:(눈이 커진다) …그럼 내일 누가 먼저 할지 정해야겠네."], ["무슨 말인지 궁금해서 잠 못 자겠다.", 5, "c:나도 못 잘 거예요. 공평하죠."]],
@@ -221,9 +231,11 @@ ${extra[k](c)}${sweat}</svg>`;
         "@stage|22:00 · 물빛무대",
         "n:밤 10시. 서윤의 휴대폰 화면이 켜졌다.",
         "n:서윤이 화면을 오래 들여다보다가, 천천히 나를 돌아봤다.",
-        "c:…붙었어요. 열두 번째에.",
+        "c:{c}…붙었어요. 열두 번째에.",
         "n:서윤이 웃는데 눈물이 먼저 떨어졌다.",
         "c:이제 약속한 말 할게요. 아, 아니다. 노래로 할게요. 그게 제일 안 떨리니까.",
+        "?s1>c:처음 만난 밤, {s1}. 그날부터 노래가 달라졌어요.",
+        "@cu",
         "n:'열두 밤'의 마지막 구절. 서윤이 노래를 멈추고 나를 똑바로 본다.",
         ["?", ["(먼저 말한다) 좋아해요. 첫 소절부터.", 15, "c:…반칙. 그거 내 대사였는데."], ["(끝까지 듣는다)", 10, "c:매일 와줘서 고마워요. 좋아해요."], ["축하해요, 진짜로.", 0, "c:고마워요. …관객님 덕분이에요."]],
       ], ok: [
@@ -253,6 +265,7 @@ ${extra[k](c)}${sweat}</svg>`;
         ["?", ["기억하셨어요?", 8, "c:야간엔 손님이 별로 없어서요. …다 기억해요."], ["오늘은 다른 거 먹을 건데요.", 2, "c:(라면을 슬쩍 내려놓는다) …네."], ["역시 이거죠.", 5, "c:물은 선까지만이에요."]],
         "n:창가 자리에서 라면을 먹는데, 그 사람이 진열대를 정리하면서 자꾸 이쪽을 본다.",
         "n:눈이 마주치자 급하게 삼각김밥 쪽으로 고개를 돌린다.",
+        "n:계산대 옆에 뜯다 만 삼각김밥 하나. 저게 저 사람 저녁인가 보다.",
         ["?", ["(손을 흔든다)", 8, "n:그 사람이 아주 작게, 한 손가락만 들어 흔들었다."], ["(모른 척 라면을 먹는다)", 5, "n:국물이 유난히 따뜻했다."]],
         "c:…안녕히 가세요. 내일도요.",
         "n:'내일도요'까지 붙이는 편의점 인사는 처음이었다.",
@@ -266,7 +279,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:조끼의 이름표가 가로등에 반짝인다. '도하'.",
         "y:도하 씨.",
         "c:…이름표 보고 부른 사람 처음이에요. 다들 '저기요'라서.",
-        ["?", ["앞으로 계속 이름으로 부를게요.", 8, "c:…네. 그럼 저도 손님 말고 다른 걸로 불러야 되나."], ["이름 예쁘네요.", 5, "c:할머니가 지어줬어요. 물 하(河). 강."]],
+        ["?", ["앞으로 계속 이름으로 부를게요.", 8, "c:…네. 그럼 저도 손님 말고 다른 걸로 불러야 되나.", "d3=계속 이름으로 불러 주겠다고 했죠"], ["이름 예쁘네요.", 5, "c:할머니가 지어줬어요. 물 하(河). 강.", "d3=제 이름이 예쁘다고 했죠"]],
         "n:쉬는 시간 5분은 생각보다 금방 끝났다.",
       ] },
       { t: "비 오는 밤", L: [
@@ -283,7 +296,7 @@ ${extra[k](c)}${sweat}</svg>`;
       { t: "목요일의 약속", L: [
         "@store|22:50 · 편의점",
         "n:우산을 돌려주러 왔다. 말린 우산에 작은 쪽지를 붙였다.",
-        ["?", ["(쪽지에 '고마워요'라고 쓴다)", 5, "c:…이거 버리지 말아야겠다."], ["(쪽지에 웃는 얼굴을 그린다)", 8, "c:(쪽지를 오래 본다) …저 닮았네요. 무표정만 빼고."]],
+        ["?", ["(쪽지에 '고마워요'라고 쓴다)", 5, "c:…이거 버리지 말아야겠다.", "d5=우산에 '고마워요' 쪽지를 붙여 줬죠"], ["(쪽지에 웃는 얼굴을 그린다)", 8, "c:(쪽지를 오래 본다) …저 닮았네요. 무표정만 빼고.", "d5=우산 쪽지에 웃는 얼굴을 그려 줬죠"]],
         "c:목요일엔 새 삼각김밥 들어와요. 명란 마요.",
         "c:…그때도 와요?",
         ["?", ["도하 씨가 있으면 올게요.", 8, "c:목요일 야간은 저 고정이에요. 고정."], ["명란 마요면 무조건이죠.", 5, "c:하나 빼놓을게요. 금방 나가요, 그거."]],
@@ -306,6 +319,9 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:쉬는 시간. 도하가 계산대 밑에서 낡은 스케치북을 꺼냈다.",
         "n:한강 다리들이 빼곡하다. 원효대교, 마포대교, 한강철교. 선이 섬세하다.",
         "c:낮엔 건축 공부해요. 다리 설계하고 싶어서. 밤엔 여기서 일하고.",
+        "c:{e}할머니가 강 건너 병원에 계세요. 다리가 하나만 더 가까우면 매일 갈 텐데. 그 생각 하다가 시작했어요.",
+        "c:{d}…요즘은 주말에만 가요. 시간이 없어서.",
+        "n:도하는 자기 라면 대신 삼각김밥을 뜯었다. 늘 그래 왔다는 듯이.",
         ["?", ["이거 도하 씨가 다 그린 거예요?", 5, "c:손님 없을 때만요. 야간이 그래서 좋아요."], ["언젠가 도하 씨가 만든 다리 건너보고 싶어요.", 8, "c:…그 말 진짜 오래 기억할 것 같아요."]],
         "n:스케치북 마지막 장에 다리가 아닌 그림이 있다.",
         "n:강가에 펼쳐진 작은 돗자리. 거기 앉은 사람의 뒷모습.",
@@ -317,6 +333,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "c:불꽃, 늘 유리문 너머로만 봤어요. 계산하느라.",
         ["?", ["오늘은 같이 제대로 봐요.", 8, "c:…네. 오늘은 손님 와도 잠깐만 기다리라고 할래요."], ["점장님한테 혼나는 거 아니에요?", 5, "c:5분은 괜찮아요. 아마."]],
         "n:불꽃이 터질 때마다 도하의 얼굴이 색깔을 바꿨다.",
+        "@cu",
         "c:…혹시 소원 빌어요?",
         ["?", ["도하 씨 다리가 꼭 지어지게요.", 8, "c:남의 소원 빌어주는 사람이 어딨어요. …고마워요."], ["비밀이에요.", 5, "c:그럼 저도 비밀. 근데 제 건 아마 같은 거예요."]],
         "n:마지막 불꽃이 질 때, 도하의 새끼손가락이 내 손등을 스쳤다. 실수는 아닌 것 같았다.",
@@ -328,6 +345,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:'아, 도하 형이요? 시험 기간이라 일주일 쉰대요. 그리고 이거, 매일 오는 분 오면 주라고.'",
         "n:봉투 안에 스케치 한 장. 돗자리 그림이 완성돼 있다. 옆에 작은 글씨.",
         "n:'말도 안 하고 쉬어서 미안해요. 시험 끝나면 라면 사줄게요. 이번엔 제가.'",
+        "n:'할머니 병원에도 다녀왔어요. 손님 얘기 했더니 웃으셨어요. 라면 친구 생겼냐고.'",
         ["?", ["(편의점에 응원 쪽지를 맡긴다)", 8, "n:'시험 잘 봐요. 물은 선까지만.' 알바생이 웃으며 받아갔다."], ["(스케치를 소중히 넣는다)", 5, "n:종이에서 희미하게 연필 냄새가 났다."], ["(괜히 서운하다)", 2, "n:말해주고 가지. 그런 생각을 하는 내가 조금 낯설었다."]],
         "n:혼자 먹는 라면은 생각보다 맛이 없었다.",
         ["?", ["(다음 주 목요일을 달력에 표시한다)", 8, "n:명란 마요 그림까지 그려 넣었다."], ["(그래도 매일 온다)", 8, "n:알바생이 '오늘도 오셨네요' 하고 웃었다."]],
@@ -340,6 +358,7 @@ ${extra[k](c)}${sweat}</svg>`;
         ["?", ["시험은요?", 5, "c:끝났어요. 쪽지 덕분에 물 조절 실수 안 했어요."], ["보고 싶었어요.", 8, "c:(삼각김밥을 떨어뜨린다) …저, 저도요."]],
         "c:약속한 라면이요. 오늘은 제가 끓일게요.",
         "n:도하가 라면 두 개에 물을 붓는다. 정확히 선까지.",
+        "?d5>c:{d5}. 그 쪽지, 아직 스케치북에 끼워 놨어요.",
         "c:있잖아요. 다음 주가 마지막 야간이에요. 낮에 설계사무소 인턴 붙어서.",
         ["?", ["축하해요! …근데 그럼 이제 못 봐요?", 8, "c:그래서 하는 말이에요. …계산대 밖에서 봐도 돼요?"], ["드디어 꿈 쪽으로 가네요.", 5, "c:손님이 다리 건너보고 싶다고 해서 힘냈어요."]],
       ] },
@@ -348,6 +367,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "c:내일이 진짜 마지막이에요. 새벽 6시에 끝나요.",
         "c:…끝나고 해 뜨는 거 같이 볼래요? 야간 하면서 매일 봤는데, 혼자라서.",
         ["?", ["새벽 6시, 여기서 기다릴게요.", 8, "c:졸리면 안 와도 돼요. …아니, 와줘요."], ["밤새울 자신 있어요.", 5, "c:라면 무한 제공할게요. 마지막 날이니까."]],
+        "?d3>c:파라솔에서 {d3}. 그 뒤로 이름표를 매일 닦아요.",
         "n:도하가 스케치북을 펼친다. 새 그림. 다리 위에 두 사람이 서 있다.",
         "c:이건 아직 다 못 그렸어요. 내일 완성하려고요.",
         ["?", ["두 사람이 누군데요?", 8, "c:…내일 알려줄게요. 해 뜨면."], ["완성되면 저 주는 거예요?", 5, "c:원래 그러려고 그렸어요."]],
@@ -359,7 +379,9 @@ ${extra[k](c)}${sweat}</svg>`;
         "c:…진짜 기다렸네요.",
         "n:강 너머로 하늘이 주황색으로 물들기 시작한다.",
         "c:그림 완성했어요. 다리 위 두 사람.",
-        "c:하나는 저예요. 하나는… 매일 선까지만 물 받던 사람.",
+        "?d1>c:처음 온 날, {d1}. 그때부터 야간이 덜 길었어요.",
+        "@cu",
+        "c:{b}하나는 저예요. 하나는… 매일 선까지만 물 받던 사람.",
         ["?", ["(도하 손을 잡는다) 이제 계산대 밖이네요.", 15, "c:…네. 이제 손님 아니에요."], ["저도 그림 속에 있고 싶었어요.", 10, "c:처음부터 있었어요. 마지막 장에."], ["그림 정말 예뻐요.", 0, "c:…고마워요. 가져가요."]],
       ], ok: [
         "@dawn|06:20 · 한강 둔치",
@@ -386,7 +408,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:이번엔 지나가지 않고 내 앞에 끼익 멈춘다.",
         ["?", ["어제 덕분에 꽉 묶었어요.", 8, "c:역시 내가 한 건 했네! 칭찬해주세요."], ["매일 이 시간에 지나가요?", 5, "c:11시 반, 반포에서 출발해서 여기 찍고 돌아가요. 매일."]],
         "c:근데 혼자 나와서 뭐 해요? 맨날 하늘 보던데.",
-        ["?", ["별 세요. 오늘은 여섯 개.", 8, "c:(하늘을 보며 손가락을 접는다) 일곱 개! 나 이겼다."], ["그냥 멍때려요.", 5, "c:그게 제일 어려운 건데. 고수네."]],
+        ["?", ["별 세요. 오늘은 여섯 개.", 8, "c:(하늘을 보며 손가락을 접는다) 일곱 개! 나 이겼다.", "h2=별을 세고 있다고 했죠. 여섯 개"], ["그냥 멍때려요.", 5, "c:그게 제일 어려운 건데. 고수네.", "h2=그냥 멍때리는 중이라고 했죠"]],
         "c:내일도 지나갈 테니까 손 흔들어줘요. 그럼 더 빨리 달려지거든요.",
         "n:불빛이 멀어지는 동안, 나도 모르게 손을 흔들고 있었다.",
       ] },
@@ -397,6 +419,7 @@ ${extra[k](c)}${sweat}</svg>`;
         ["?", ["그럼 저는 밤에만 해 보는 거네요.", 8, "c:와, 그거 오늘 들은 말 중에 제일 좋다."], ["해솔. 밝은 이름이다.", 5, "c:이름값 하려고 맨날 웃어요."]],
         "n:해솔이 물병을 꺼내 마시고 내 옆에 털썩 앉았다.",
         "c:원래 안 멈추는데. 여기서 멈추면 기록이 늦어져요.",
+        "n:물병을 든 해솔의 손목에 병원 팔찌 자국 같은 흰 줄이 보였다. 해솔이 소매로 슬쩍 가렸다.",
         "c:근데 요즘 기록보다 여기 멈추는 게 더 재밌어요.",
         ["?", ["그럼 내일도 멈춰요.", 8, "c:그럼 1분 일찍 출발해야겠다."], ["기록이 그렇게 중요해요?", 5, "c:음… 그건 나중에 말해줄게요. 좀 긴 얘기라."]],
       ] },
@@ -405,7 +428,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:비가 오는데도 그 시간에 불빛이 보였다. 해솔이 자전거를 끌고 오고 있다.",
         "n:온몸이 젖었는데 웃고 있다.",
         "c:비 와도 달려요. 하루라도 거르면 안 되거든요!",
-        ["?", ["(수건을 건넨다) 감기 걸려요.", 8, "c:헐, 수건 왜 갖고 다녀요? …나 때문에?"], ["바보 아니에요?", 5, "c:들켰다. 근데 비 맞으면 기분 좋아요. 해봐요."]],
+        ["?", ["(수건을 건넨다) 감기 걸려요.", 8, "c:헐, 수건 왜 갖고 다녀요? …나 때문에?", "h4=비 오는 날 수건을 건네줬죠"], ["바보 아니에요?", 5, "c:들켰다. 근데 비 맞으면 기분 좋아요. 해봐요.", "h4=비 맞고 온 저한테 바보냐고 했죠"]],
         "n:그늘막 아래 나란히 앉았다. 해솔의 머리에서 빗물이 똑똑 떨어진다.",
         "c:있잖아요. 비 오는 날 누가 기다려준 거, 처음이에요.",
         ["?", ["기다린 거 아니에요. …조금만요.", 8, "c:조금만도 좋아요. (웃음이 커진다)"], ["다음엔 우산 들고 올게요.", 5, "c:우산 쓰고 자전거 못 타요. 그냥 수건으로 해줘요."]],
@@ -436,6 +459,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "c:기록이 왜 중요하냐고 물었죠. 사실 기록이 아니라 '매일'이 중요해요.",
         "c:작년에 많이 아팠어요. 수술도 크게 하고. 의사 선생님이 매일 조금씩 움직이래서 시작했어요.",
         "c:하루도 안 거르는 게, 아, 나 아직 괜찮구나 하는 확인 같아서.",
+        "c:{c}수술 전날 밤에 병실 창문으로 한강이 보였어요. 나가면 저기 매일 달려야지, 그렇게 약속했어요.",
         ["?", ["(말없이 손을 잡는다)", 8, "c:…따뜻하다. 이러면 안 울려고 했는데."], ["말해줘서 고마워요.", 5, "c:아무한테도 안 했어요. 맨날 웃으니까 다들 모르더라고요."]],
         "c:그래서 사실 무서웠어요. 누구랑 친해지는 거. 내가 갑자기 없어지면 어떡하나.",
         ["?", ["해솔 씨 매일, 저도 같이 셀게요.", 8, "c:…그 말이 제일 듣고 싶었나 봐요."], ["안 없어져요. 이렇게 잘 달리는데.", 5, "c:그쵸? 나 빠르죠?"]],
@@ -444,6 +468,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "@fire|00:00 · 마포대교 위",
         "n:자정. 다리 위에서 불꽃놀이가 시작됐다.",
         "n:해솔이 처음으로, 달리다가 자전거를 완전히 세웠다.",
+        "@cu",
         "c:달리면서 보는 불꽃은 늘 뒤로 지나갔어요. 오늘은 멈춰서 볼래요.",
         ["?", ["오늘은 기록 말고 이거 기억해요.", 8, "c:응. 오늘은 이걸로 매일 도장 찍을래요."], ["멈추니까 어때요?", 5, "c:생각보다 안 무서워요. 옆에 누가 있어서."]],
         "n:불꽃이 터질 때마다 해솔이 아이처럼 손가락으로 가리켰다.",
@@ -457,6 +482,7 @@ ${extra[k](c)}${sweat}</svg>`;
         ["?", ["(해솔의 코스를 거꾸로 걸어간다)", 8, "n:반포 쪽으로 한참을 걸었다. 자전거는 보이지 않았다."], ["(그 자리에서 기다린다)", 8, "n:새벽 1시까지 자전거길만 바라봤다."], ["(무슨 일 있겠어, 하고 돌아간다)", 2, "n:돌아가는 길, 자꾸 뒤를 돌아봤다."]],
         "n:휴대폰이 울린다. 지난번에 교환한 번호.",
         "n:'오늘 정기검진이라 병원에서 자요. 별일 아니에요! 매일 깨서 미안. 내일 갈게요.'",
+        "n:조금 뒤 메시지 하나가 더 왔다. '사실 조금 무서웠어요. 근데 내일 갈 데가 있으니까 괜찮아요.'",
         ["?", ["'내일 맨 앞에서 손 흔들게요.'", 8, "n:답장이 바로 왔다. '그럼 더 빨리 달려야겠다 ㅎㅎ'"], ["'걱정했잖아요.'", 8, "n:한참 뒤 답장. '…걱정해주는 사람 있으니까 좋다.'"]],
       ] },
       { t: "용기 내는 밤", L: [
@@ -466,6 +492,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:해솔이 자전거를 던지듯 세우고 달려온다.",
         ["?", ["(꽉 안아준다)", 8, "c:…헉. 숨 막혀요. 아니, 더 해줘요."], ["다행이다. 진짜 다행이다.", 5, "c:울어요? 왜 울어요, 내가 울려고 했는데."]],
         "n:한참 그렇게 서 있었다. 해솔의 심장 소리가 크게 들렸다.",
+        "?h4>c:{h4}. 병원에서 그 생각 하면서 버텼어요.",
         "c:어제 병원에서 생각했어요. 다음 검진 때도 이 사람이 기다려주면 좋겠다고.",
         ["?", ["다음에도, 그다음에도 기다릴게요.", 8, "c:…그거 약속이에요. 무를 수 없어요."], ["다음엔 병원 앞에서 기다릴게요.", 5, "c:그건 좀 부끄러운데. …좋다."]],
       ] },
@@ -474,6 +501,7 @@ ${extra[k](c)}${sweat}</svg>`;
         "c:내일이 처음 달리기 시작한 지 딱 1년 되는 날이에요.",
         "c:365일 중에 어제 하루 빼고 다 달렸어요. 아깝다.",
         ["?", ["어제는 제가 대신 기다렸으니까 친 걸로 해요.", 8, "c:오, 대리 출석 인정! 그럼 365일 만점."], ["364일도 엄청난 거예요.", 5, "c:그쵸? 칭찬 더 해줘요."]],
+        "?h2>c:처음에 {h2}. 오늘은 내가 셀게요. 하나, 둘, 셋… 그리고 옆에 하나.",
         "c:내일, 처음 출발한 반포에서 여의도까지 같이 달려줄래요?",
         "c:그리고… 도착하면 할 말 있어요.",
         ["?", ["저도 도착하면 할 말 있어요.", 8, "c:헐. 그럼 누가 먼저 도착하는지 내기해요."], ["무슨 말인데요? 지금 해요.", 4, "c:안 돼요. 1주년 기념 특별 발언이라."]],
@@ -486,6 +514,8 @@ ${extra[k](c)}${sweat}</svg>`;
         "n:강바람을 가르며 함께 달렸다. 해솔은 오늘은 뒤를 돌아보지 않는다. 바로 옆에 있으니까.",
         "@river|00:00 · 여의도 도착",
         "n:여의도. 처음 만난 밤, 내 돗자리가 있던 자리.",
+        "?h1>c:돗자리 끈 풀린 날, {h1}. 그게 1년 중에 제일 웃긴 밤이었어요.",
+        "@cu",
         "c:1년 전엔 그냥 살려고 달렸어요. 요즘은 여기 오려고 달려요.",
         ["?", ["(먼저 말한다) 해솔 씨 매일에 저도 넣어줘요.", 15, "c:…반칙. 그거 내가 할 말이었는데!"], ["(해솔의 말을 기다린다)", 10, "c:좋아해요. 돗자리 끈 풀린 날부터."], ["1주년 축하해요!", 0, "c:고마워요! 덕분에 완주했어요."]],
       ], ok: [
@@ -507,6 +537,18 @@ ${extra[k](c)}${sweat}</svg>`;
       ] },
     ],
   };
+  // 화가 끝나면 보여 주는 그 사람의 속마음(1~11화)
+  const INNER = {
+    s: ["오늘 관객이 한 명 있었다. 이상하게, 그 한 명 앞에서 목소리가 더 떨렸다.", "아무도 모르는 내 노래를 끝까지 들어 준 사람. 박수 소리가 아직 귀에 남아 있다.", "이름을 말해 버렸다. 이제 '관객님'이라고만 부르기엔 늦은 것 같다.", "비 오는 날 노래는 원래 나 혼자 듣는 건데. 오늘은 둘이었다.", "제일 아끼는 피크를 줘 버렸다. 내일 안 오면 어떡하지. …올 거야.", "그 사람 표정이 서운해 보였을 때, 솔직히 조금 기뻤다. 나 나쁜가.", "아빠 얘기를 해 버렸다. 그런데 울지 않았다. 옆에 있어서인가.", "불꽃보다 옆얼굴을 더 많이 봤다. 들킨 것 같다.", "피크를 두고 왔다. 그거라도 내 대신 그 자리에 있어 줬으면 해서.", "마지막 구절을 들려줬다. 눈치챘을까. 눈치챘으면 좋겠다.", "내일, 오디션 결과보다 더 떨리는 게 있다."],
+    d: ["매운 라면 고르는 손이 차가워 보였다. 그래서 다른 걸 줬다. …오지랖이었나.", "'내일도요'라고 해 버렸다. 편의점 인사에 그런 말은 없는데.", "이름을 불렸다. 할머니 말고는 오랜만이다.", "우산을 줬다. 새벽에 비 맞고 가도 괜찮다. 그 사람이 안 젖었으니까.", "사탕은 원래 할머니 드리려던 거였다. 그래도 하나도 아깝지 않다.", "제일 엉망인 얼굴을 보여 줬다. 그런데 그 사람은 끝까지 기다렸다.", "스케치북 마지막 장을 들켰다. 다리보다 그 그림을 더 오래 그렸는데.", "처음으로 계산대 밖에서 불꽃을 봤다. 옆에 누가 있으니까 소리가 더 컸다.", "시험장에서 물병을 따는데, '선까지만' 쪽지가 생각나서 웃었다.", "계산대 밖에서 보자고 했다. 내 인생에서 제일 긴 문장이었다.", "그림 속 두 사람. 해가 뜨면 한 사람의 이름을 말해야 한다."],
+    h: ["돗자리 끈 하나 알려줬을 뿐인데, 오늘 달리기가 제일 가벼웠다.", "별 개수 내기에서 이겼다. 사실 나도 일곱 개였는지는 모르겠다.", "처음으로 코스 중간에 멈췄다. 기록은 1분 늦었고, 기분은 1년 빨랐다.", "비 오는 날 누가 기다려 준 거, 진짜 처음이었다.", "새끼손가락 도장. 아프고 나서 미래 약속은 안 했었는데.", "'그래서 좋아요'라고 했다. 한 번 더 듣고 싶어서 못 들은 척했다.", "아팠던 얘기를 해 버렸다. 그런데 그 사람은 도망가지 않았다.", "하트 불꽃. 진짜였는지 모르지만, 같이 봤으니까 진짜다.", "병원 침대에서 자전거길 사진만 봤다. 그 자리에 누가 서 있을 것 같아서.", "검진 결과보다 그 사람 얼굴이 먼저 보고 싶었다.", "1년 전엔 살려고 달렸다. 내일은 말하려고 달린다."],
+  };
+  // 다음에 한강에 들어오면 뜨는 그 사람의 한 줄(1~11화 뒤)
+  const NEXT = {
+    s: ["어제 그 관객님, 오늘도 와요? 신청곡 받을게요.", "어제 그 노래, 제목 정했어요. 아직 비밀.", "이름 불러 줘서 좋았어요. 오늘도 불러 줘요.", "비 그쳤어요. 오늘은 앰프 켜고 불러요.", "피크, 잃어버리지 않았죠? 오늘 돌려줘요.", "어제 표정, 아직 생각나요. 오늘은 맨 앞에 서 있어요.", "어제 얘기 들어 줘서 고마워요. 오늘은 밝은 노래 할게요.", "어제 불꽃, 몇 번째 게 제일 예뻤어요? 난 마지막.", "쪽지 봤어요. 오늘은 꼭 갈게요.", "마지막 구절, 오늘도 생각했어요?", "오늘 밤 10시. 무대 앞에서 기다릴게요."],
+    d: ["어제 그 라면, 오늘도 하나 빼 둘게요.", "오늘도 물은 선까지만이에요.", "…이름 불러 주는 거, 오늘도 해 줘요.", "우산은 천천히 돌려줘도 돼요. 오기만 하면 돼요.", "명란 마요 하나 빼 놨어요. 목요일 아니어도.", "어제 고마웠어요. 오늘은 표정 연습했어요.", "스케치북 일은… 잊어 주세요. 아니, 잊지 마요.", "어제 불꽃, 계산대 밖에서 보니까 달랐어요.", "시험 끝나면 라면 살게요. 조금만 기다려 줘요.", "마지막 야간까지 며칠 안 남았어요. 와 줄 거죠?", "새벽 6시. 해 뜨는 거, 같이 봐요."],
+    h: ["오늘도 돗자리 끈 잘 묶었죠? 지나가면서 확인할 거예요!", "오늘 별 몇 개 보여요? 내기 다시 해요.", "오늘도 멈출게요. 1분 일찍 출발했어요.", "수건 빨아서 갖고 갈게요. 감기 안 걸렸어요!", "11시 반. 늦으면 벌칙인 거 알죠?", "어제 그 말, 한 번만 더 해 주면 안 돼요?", "어제 얘기 들어 줘서 고마워요. 오늘도 달렸어요. 매일.", "그 하트, 우리 거 맞죠?", "오늘은 병원 말고 자전거길에서 봐요!", "다음 검진도 기다려 준다고 한 거, 저장해 뒀어요.", "내일 반포 출발. 리본 달고 갈게요."],
+  };
   const OK_AT = 145, MID_AT = 115;   // 엔딩 기준: 최고 183, 전부 중간 선택 약 118, 전부 아쉬운 선택 약 90. 12화에서 마음을 안 전하면 고백 엔딩은 없음
 
   // ── 저장(이 폰에만) ──
@@ -521,7 +563,7 @@ ${extra[k](c)}${sweat}</svg>`;
   const hhmmss = ms => { const s = Math.ceil(ms / 1000); return [s / 3600 | 0, (s / 60 | 0) % 60, s % 60].map(v => String(v).padStart(2, "0")).join(":"); };
 
   // ── 화면 ──
-  let opt = {}, box, cv, cx, raf, scene = "river", sub = "", who = null, timer, mood = "n", moodNext = "", shown = "";
+  let opt = {}, box, cv, cx, raf, scene = "river", sub = "", who = null, timer, mood = "n", moodNext = "", shown = "", cu = false;
   const F = `-apple-system, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif`;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const css = `
@@ -570,6 +612,17 @@ ${extra[k](c)}${sweat}</svg>`;
   @keyframes stwin{from{opacity:0;transform:translateY(14px) scale(.97)}}
   #stBox.chz .who{bottom:41%}
   @media (max-height:640px){#stBox .who{bottom:34%;width:min(52vw,230px)}#stBox.chz .who{bottom:46%}}
+  #stBox .who{transition:bottom .3s,width .5s}
+  #stBox.cu .who{width:min(118vw,560px);bottom:24%}
+  #stBox.cu.chz .who{bottom:36%}
+  #stBox .who .ey{transform-box:fill-box;transform-origin:center;animation:stbl 4.8s infinite}
+  @keyframes stbl{0%,94%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.08)}}
+  #stBox .mt{opacity:0}
+  #stBox .who.tk .mt{animation:stmt .24s steps(1) infinite}
+  #stBox .who.tk .mo{animation:stmo .24s steps(1) infinite}
+  @keyframes stmt{0%{opacity:0}50%{opacity:1}}
+  @keyframes stmo{0%{opacity:1}50%{opacity:0}}
+  #stBox .msg.in{font-style:italic;color:#f3e6ff;border-color:rgba(255,159,182,.5)}
   #stBox .ppl .fc{display:block;width:76px;margin:0 auto -2px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.05)}
   #stBox .ppl .fc svg{display:block;width:100%;height:auto}`;
 
@@ -625,7 +678,8 @@ ${extra[k](c)}${sweat}</svg>`;
     shown = key; el.innerHTML = key ? window.HNChar.face(who, mood) : "";
     el.classList.toggle("in", !sameP); 
   }
-  const MOODS = [["b", /얼굴이 빨|붉어|부끄|수줍|시선을 피|귀가 빨|눈을 못/], ["d", /미안|울먹|눈물|슬퍼|슬프|힘들|아파|떠나|그만둘|못 할|한숨/], ["o", /어\?|헉|앗|!\?|뭐야|깜짝|놀라|진짜요\?/], ["s", /웃|ㅋㅋ|ㅎㅎ|하하|고마|좋아|다행|반가/]];
+  function talk(on) { const el = box && box.querySelector(".who"); if (el) el.classList.toggle("tk", on); }
+  const MOODS = [["c", /웃는데 눈물|울면서 웃|눈물이 먼저|울 것 같은데 웃/], ["b", /얼굴이 빨|붉어|부끄|수줍|시선을 피|귀가 빨|눈을 못/], ["d", /미안|울먹|눈물|슬퍼|슬프|힘들|아파|떠나|그만둘|못 할|한숨/], ["o", /어\?|헉|앗|!\?|뭐야|깜짝|놀라|진짜요\?/], ["p", /반칙|치사|흥\.|삐졌|억울/], ["s", /웃|ㅋㅋ|ㅎㅎ|하하|고마|좋아|다행|반가/]];
   function moodOf(t) { for (const [m, re] of MOODS) if (re.test(t)) return m; return ""; }
   function loop(t) { draw(t); raf = requestAnimationFrame(loop); }
 
@@ -641,18 +695,22 @@ ${extra[k](c)}${sweat}</svg>`;
   function step() {
     clearInterval(typing);
     if (i >= L.length) return finish();
-    const ln = L[i++];
+    let ln = L[i++];
     if (Array.isArray(ln)) return choose(ln);
-    const k = ln[0], body = ln.slice(2);
-    if (k === "@") { const [s, c] = body.split("|"); scene = s; sub = c || ""; who = null; mood = "n"; return step(); }
+    if (ln[0] === "?") { const g = ln.indexOf(">"), key = ln.slice(1, g), M = S.m || {}; if (!M[key]) return step(); ln = ln.slice(g + 1).replace(/\{(\w\d)\}/g, (_, q) => M[q] || ""); }
+    if (ln === "@cu") { cu = true; box.classList.add("cu"); return step(); }
+    const k = ln[0]; let body = ln.slice(2), tag = "";
+    if (/^\{[a-z]\}/.test(body)) { tag = body[1]; body = body.slice(3); }
+    if (k === "@") { const [s, c] = body.split("|"); scene = s; sub = c || ""; who = null; mood = "n"; cu = false; box.classList.remove("cu"); return step(); }
     const sp = k === "c" ? S.r : k;
     who = sp === "n" || sp === "y" ? who : sp;
     box.classList.remove("chz");
-    if (CH[sp]) { mood = moodOf(body) || moodNext || "n"; moodNext = ""; }
+    if (CH[sp]) { mood = tag || moodOf(body) || moodNext || "n"; moodNext = ""; }
     const isN = sp === "n", nm = isN ? "" : nameOf(sp), col = sp === "y" ? "#f3d9a4" : CH[sp] ? CH[sp].col : "";
     ui().innerHTML = top(`<div class="sp"></div>${isN ? "" : `<div class="nm" style="background:${col}">${esc(nm)}</div>`}<div class="msg ${isN ? "nar" : ""}" data-do="next"><span class="tx"></span><span class="go">▼</span></div>`);
     const tx = ui().querySelector(".tx"), full = isN ? body : body; let n = 0;
-    typing = setInterval(() => { n += 2; tx.textContent = full.slice(0, n); if (n >= full.length) { clearInterval(typing); typing = null; } }, 28);
+    talk(!!CH[sp]);
+    typing = setInterval(() => { n += 2; tx.textContent = full.slice(0, n); if (n >= full.length) { clearInterval(typing); typing = null; talk(false); } }, 28);
     tx.dataset.full = full;
     box._last = { isN, nm, col, full };
   }
@@ -668,6 +726,7 @@ ${extra[k](c)}${sweat}</svg>`;
     if (v && typeof v === "object" && v.pick) { S.r = v.pick; }
     else if (typeof v === "number") { if (S.ep === 12) S.last = v; S.h[S.r] = (S.h[S.r] || 0) + v; if (v > 0) pop(`${CH[S.r].e} ♡ +${v}`); }
     else if (v) for (const c in v) { S.h[c] = (S.h[c] || 0) + v[c]; if (v[c] > 0) pop(`${CH[c].e} ♡ +${v[c]}`); }
+    if (o[3]) { const q = o[3].indexOf("="); S.m = S.m || {}; S.m[o[3].slice(0, q)] = o[3].slice(q + 1); }
     const gain = typeof v === "number" ? v : v && !v.pick ? Math.max(...Object.values(v)) : 0;
     moodNext = v && v.pick ? "s" : gain >= 8 ? "b" : gain > 0 ? "s" : "";
     save();
@@ -682,7 +741,13 @@ ${extra[k](c)}${sweat}</svg>`;
       box._ending = k; L = d[k].slice(); i = 0; return step();
     }
     if (S.ep === 12) { const k = box._ending; box._ending = null; S.ends[S.r] = k; opt.stat && opt.stat("rd_" + k); S.done = S.r; S.ep = 13; save(); return ending(k); }
-    S.ep++; S.at = opt.admin && opt.admin() ? 0 : next22(Date.now()); save(); who = S.ep === 2 ? S.r : who; cover();
+    const done = S.ep, nx = NEXT[S.r] && NEXT[S.r][done - 1];
+    S.ep++; S.at = opt.admin && opt.admin() ? 0 : next22(Date.now()); if (nx) { S.nx = `${CH[S.r].e} ${CH[S.r].n}: ${nx}`; S.nxa = 0; } save(); who = S.r; inner(done);
+  }
+  function inner(ep) {
+    const t = INNER[S.r] && INNER[S.r][ep - 1]; if (!t) return cover();
+    cu = true; box.classList.add("cu"); box.classList.remove("chz"); mood = "b"; scene = "river"; sub = ""; talk(false);
+    ui().innerHTML = `<div class="top"><span class="t">🌙 ${ep}화 끝</span><button class="x" data-do="close" aria-label="닫기">✕</button></div><div class="sp"></div><div class="nm" style="background:${CH[S.r].col}">💭 ${esc(CH[S.r].n)}의 속마음</div><div class="msg in" data-do="cov">${esc(t)}<span class="go">▼</span></div>`;
   }
   const ENDS = { ok: ["💞", "고백 성공"], mid: ["🌙", "여운 — 다음 시즌에 계속"], fr: ["🤝", "좋은 친구"] };
   function credits() {
@@ -691,7 +756,7 @@ ${extra[k](c)}${sweat}</svg>`;
   }
   function supBox(msg) { return `<div class="sup">💛 ${msg}<button data-do="sup">응원하기</button></div>`; }
   function ending(k) {
-    const c = CH[S.r], e = ENDS[k]; scene = k === "ok" ? "fire" : "river"; who = S.r; sub = ""; mood = k === "ok" ? "b" : k === "mid" ? "n" : "s";
+    const c = CH[S.r], e = ENDS[k]; cu = false; box.classList.remove("cu", "chz"); if (S.nx) { delete S.nx; save(); } scene = k === "ok" ? "fire" : "river"; who = S.r; sub = ""; mood = k === "ok" ? "b" : k === "mid" ? "n" : "s";
     const seen = Object.keys(S.ends).length;
     ui().innerHTML = `<div class="top"><span class="t">🌙 한강, 열두 밤 · 엔딩</span><button class="x" data-do="close" aria-label="닫기">✕</button></div>
       <div class="card"><div class="end">${e[0]}</div><h2>${esc(c.n)} · ${e[1]}</h2><p>열두 밤 동안 ${c.e} ♡ ${S.h[S.r]}</p>
@@ -703,7 +768,7 @@ ${extra[k](c)}${sweat}</svg>`;
   function cover() {
     clearInterval(timer);
     if (S.ep > 12) return ending(S.ends[S.done] || "fr");
-    const d = epData(), wait = left(); who = S.r && S.ep > 1 ? S.r : null; scene = "river"; sub = ""; mood = "s";
+    const d = epData(), wait = left(); who = S.r && S.ep > 1 ? S.r : null; scene = "river"; sub = ""; mood = "s"; cu = false; box.classList.remove("cu", "chz");
     const ppl = Object.keys(CH).map(k => `<div class="${S.r === k ? "me" : ""}"><span class="fc">${window.HNChar.face(k, "s")}</span>${CH[k].e} ${CH[k].n}<small>${CH[k].who}</small>${S.ends[k] ? `<small>${ENDS[S.ends[k]][0]}</small>` : ""}</div>`).join("");
     ui().innerHTML = `<div class="top"><span class="t">📖 한강 이야기</span><button class="x" data-do="close" aria-label="닫기">✕</button></div>
       <div class="card"><h2>🌙 한강, 열두 밤</h2><p>매일 밤 10시, 한 화씩 열려요</p>
@@ -717,12 +782,13 @@ ${extra[k](c)}${sweat}</svg>`;
     const el = e.target.closest("[data-do]"); if (!el) return; const a = el.dataset.do;
     if (a === "close") return close();
     if (a === "play") return play();
-    if (a === "next") { const tx = el.querySelector(".tx"); if (typing) { clearInterval(typing); typing = null; tx.textContent = tx.dataset.full; return; } return step(); }
+    if (a === "cov") { cu = false; box.classList.remove("cu"); return cover(); }
+    if (a === "next") { const tx = el.querySelector(".tx"); if (typing) { clearInterval(typing); typing = null; talk(false); tx.textContent = tx.dataset.full; return; } return step(); }
     if (a === "ch") return pick(+el.dataset.k);
     if (a === "sup") { opt.stat && opt.stat("rsup"); close(); return opt.openSup && opt.openSup(); }
     if (a === "restart") { S = { ep: 1, h: { s: 0, d: 0, h: 0 }, at: 0, ends: S.ends }; save(); return cover(); }
   }
-  function open() { if (!box) { build(); box.addEventListener("click", onClick); } box.classList.add("on"); opt.closeOthers && opt.closeOthers(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); cover(); }
+  function open() { const L2 = load(); if (L2.ep) S = L2; if (!box) { build(); box.addEventListener("click", onClick); } box.classList.add("on"); opt.closeOthers && opt.closeOthers(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); cover(); }
   function close() { if (!box) return; box.classList.remove("on"); cancelAnimationFrame(raf); clearInterval(timer); clearInterval(typing); }
   H.init = o => { opt = o || {}; };
   H.open = open; H.close = close; H.isOpen = () => !!box && box.classList.contains("on");
