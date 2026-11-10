@@ -1,6 +1,72 @@
 // 🌙 한강, 열두 밤 — 매일 밤 10시에 한 화씩 열리는 연애 이야기 (01·02 공통, 누를 때만 불러옴 → 첫 접속 용량 0)
 // 저장은 이 폰 localStorage(hn-story)에만. 서버 저장·서버 변경 없음.
 // 사용: HNStory.init({ myNick, names, openSup, closeOthers, stat, admin }) 후 HNStory.open()
+// 열두 밤 인물 그림(SVG 코드, 이미지 파일 없음). HNChar.face(k, mood) → svg 문자열. mood: n 기본, s 웃음, b 부끄러움, d 슬픔, o 놀람
+window.HNChar = (() => {
+  let uid = 0;
+  const P = {
+    s: { skin: "#fbe2d2", sh: "#e9b9a4", hair: "#2b2140", hl: "#5d4f86", eye: "#6b3f2a", eye2: "#d99a5c", top: "#ee8a5c", top2: "#c9663c" },
+    d: { skin: "#f8dcc8", sh: "#e2b29a", hair: "#33261f", hl: "#6e5444", eye: "#2c2f3a", eye2: "#6f87a8", top: "#f6f3ec", top2: "#2b7de0" },
+    h: { skin: "#fbe0cc", sh: "#e6b49c", hair: "#9a6534", hl: "#e0a868", eye: "#5a3a1e", eye2: "#c99a4a", top: "#5cbf6a", top2: "#3b9a4b" },
+  };
+  const FACE = "M62 98 C62 64 148 64 148 98 C148 122 141 139 125 150 Q105 163 85 150 C69 139 62 122 62 98 Z";
+  const back = {
+    s: "M56 96 C48 34 162 28 154 96 C156 130 162 162 168 198 C152 206 136 198 132 182 L78 182 C74 198 58 206 42 198 C48 162 54 130 56 96 Z",
+    d: "M58 102 C50 42 160 34 152 102 L150 120 L60 120 Z",
+    h: "M56 100 C46 40 162 30 154 100 L150 128 L60 128 Z",
+  };
+  const front = {
+    s: "M58 106 C54 58 84 42 110 44 C140 46 156 66 152 106 C148 96 142 88 136 84 C134 94 128 100 120 104 C122 96 122 90 120 84 C110 96 96 100 80 102 C86 96 88 90 88 86 C80 94 68 100 58 106 Z",
+    d: "M59 106 C55 60 86 44 111 46 C138 48 155 66 151 106 C148 98 144 92 138 88 C137 96 132 101 124 104 C125 97 124 92 121 87 C112 96 98 100 84 101 C89 96 91 91 91 88 C82 95 70 101 59 106 Z",
+    h: "M57 100 L61 72 L72 82 L76 54 L91 70 L101 44 L113 66 L127 46 L132 70 L147 58 L148 82 L154 100 C140 88 124 82 106 82 C88 82 72 88 57 100 Z",
+  };
+  const extra = {
+    s: c => `<path d="M60 100 C55 124 58 152 50 182 C64 176 70 150 69 118 Z M150 100 C155 124 152 152 160 182 C146 176 140 150 141 118 Z" fill="${c.hair}"/><path d="M131 70 l9 -5 l4 9 l-8 6 z" fill="#ffb07a" stroke="#c9663c" stroke-width="1.5"/>`,
+    d: c => ``,
+    h: c => `<path d="M59 88 C80 72 130 72 151 88 L151 97 C130 82 80 82 59 97 Z" fill="#fdfdf7"/><path d="M60 92 C80 77 130 77 150 92" stroke="#3b9a4b" stroke-width="2" fill="none"/>`,
+  };
+  const body = {
+    s: c => `<path d="M38 232 C40 186 68 168 105 168 C142 168 170 186 172 232 Z" fill="${c.top}"/><path d="M84 168 C90 184 120 184 126 168 L120 166 C114 176 96 176 90 166 Z" fill="${c.top2}"/><path d="M92 176 L82 232 M118 176 L128 232" stroke="${c.top2}" stroke-width="2.5"/><circle cx="82" cy="206" r="2.5" fill="#fff"/><circle cx="128" cy="206" r="2.5" fill="#fff"/><path d="M152 178 L62 232" stroke="#4a3426" stroke-width="8" stroke-linecap="round"/><path d="M152 178 L62 232" stroke="#6b4c38" stroke-width="2" stroke-dasharray="4 5"/>`,
+    d: c => `<path d="M38 232 C40 186 68 168 105 168 C142 168 170 186 172 232 Z" fill="${c.top}"/><path d="M38 232 C42 192 60 176 82 171 L92 232 Z M172 232 C168 192 150 176 128 171 L118 232 Z" fill="${c.top2}"/><rect x="134" y="196" width="24" height="10" rx="2" fill="#fff"/><path d="M138 201 h14" stroke="${c.top2}" stroke-width="2"/><path d="M90 168 L105 188 L120 168" fill="none" stroke="#d9d4ca" stroke-width="3"/>`,
+    h: c => `<path d="M38 232 C40 186 68 168 105 168 C142 168 170 186 172 232 Z" fill="${c.top}"/><path d="M105 176 L105 232" stroke="${c.top2}" stroke-width="4"/><path d="M82 166 L105 196 L128 166 L120 164 L105 184 L90 164 Z" fill="${c.top2}"/><path d="M46 208 L80 200 M164 208 L130 200" stroke="#fff" stroke-opacity=".75" stroke-width="4" stroke-linecap="round"/>`,
+  };
+  function eyes(c, m, g) {
+    const L = 86, R = 124, Y = 114;
+    const brow = (x, f) => m === "d" ? `<path d="M${x - 9 * f} ${Y - 20} L${x + 8 * f} ${Y - 25}" stroke="${c.hair}" stroke-width="2.6" stroke-linecap="round"/>` : `<path d="M${x - 9} ${Y - 21 - (m === "o" ? 4 : 0)} Q${x} ${Y - 26 - (m === "o" ? 4 : 0)} ${x + 9} ${Y - 22 - (m === "o" ? 4 : 0)}" stroke="${c.hair}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+    if (m === "s") return [L, R].map((x, i) => `<path d="M${x - 10} ${Y + 2} Q${x} ${Y - 9} ${x + 10} ${Y + 2}" stroke="#2a1d26" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M${x + (i ? 10 : -10)} ${Y + 1} l${i ? 4 : -4} -2" stroke="#2a1d26" stroke-width="2.4" stroke-linecap="round"/>` + brow(x, i ? -1 : 1)).join("");
+    const h = m === "o" ? 16 : m === "d" ? 12 : 14;
+    const one = (x, f) => `<ellipse cx="${x}" cy="${Y}" rx="11" ry="${h}" fill="#fff"/><ellipse cx="${x + f * .5}" cy="${Y + 1.5}" rx="8.6" ry="${h - 1.2}" fill="url(#${g}i)"/><ellipse cx="${x + f * .5}" cy="${Y + 1}" rx="4.2" ry="${h - 6}" fill="#160f18"/><ellipse cx="${x - 3}" cy="${Y - 5}" rx="3.6" ry="4.2" fill="#fff"/><circle cx="${x + 3.6}" cy="${Y + 6}" r="1.7" fill="#fff" opacity=".9"/><path d="M${x - 12} ${Y - h + 5} Q${x - 2} ${Y - h - 5} ${x + 12} ${Y - h + 3}" stroke="#1d141c" stroke-width="3.8" fill="none" stroke-linecap="round"/><path d="M${x + f * 11} ${Y - h + 4} l${f * 5} -3 M${x + f * 12} ${Y - h + 8} l${f * 4} -1" stroke="#1d141c" stroke-width="2.2" stroke-linecap="round"/><path d="M${x - 6} ${Y + h + 1} Q${x} ${Y + h + 3} ${x + 6} ${Y + h + 1}" stroke="${c.sh}" stroke-width="1.6" fill="none" stroke-linecap="round"/>` + brow(x, -f);
+    return one(L, -1) + one(R, 1);
+  }
+  function mouth(m) {
+    if (m === "s") return `<path d="M95 138 Q105 150 115 138 Q105 142 95 138 Z" fill="#c4504f"/><path d="M99 141 Q105 146 111 141" fill="#ff8a8a"/>`;
+    if (m === "o") return `<ellipse cx="105" cy="142" rx="4.5" ry="5.5" fill="#a8403f"/><ellipse cx="105" cy="144.5" rx="2.6" ry="2" fill="#ff8a8a"/>`;
+    if (m === "d") return `<path d="M98 143 Q105 138 112 143" stroke="#a8403f" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+    if (m === "b") return `<path d="M100 141 Q103 139 105 141 Q107 139 110 141" stroke="#a8403f" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    return `<path d="M98 139 Q105 145 112 139" stroke="#a8403f" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  }
+  function face(k, m = "n") {
+    const c = P[k], g = "hc" + k + (++uid);
+    const blushO = m === "b" ? .6 : m === "s" ? .4 : .2;
+    const blush = `<ellipse cx="78" cy="131" rx="11" ry="5.5" fill="#ff7f8a" opacity="${blushO}"/><ellipse cx="132" cy="131" rx="11" ry="5.5" fill="#ff7f8a" opacity="${blushO}"/>` + (m === "b" ? `<path d="M71 129 l4 -4 M77 130 l4 -4 M83 130 l4 -4 M127 130 l4 -4 M133 130 l4 -4 M139 129 l4 -4" stroke="#e05a6a" stroke-width="1.5" stroke-linecap="round"/>` : "");
+    const tear = m === "d" ? `<path d="M80 128 q-3 7 0 10 q3 -3 0 -10" fill="#9fd8ff"/>` : "";
+    const sweat = m === "o" ? `<path d="M150 80 q-4 7 0 10 q4 -3 0 -10" fill="#bfe6ff"/>` : "";
+    return `<svg viewBox="0 0 210 232" xmlns="http://www.w3.org/2000/svg"><defs>
+<linearGradient id="${g}i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d141c"/><stop offset=".45" stop-color="${c.eye}"/><stop offset="1" stop-color="${c.eye2}"/></linearGradient>
+<linearGradient id="${g}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c.hl}"/><stop offset=".35" stop-color="${c.hair}"/></linearGradient>
+<clipPath id="${g}f"><path d="${FACE}"/></clipPath><clipPath id="${g}c"><path d="${front[k]}"/></clipPath></defs>
+<path d="${back[k]}" fill="${c.hair}"/>${body[k](c)}
+<rect x="95" y="146" width="20" height="26" fill="${c.skin}"/><path d="M95 156 Q105 166 115 156 L115 172 L95 172 Z" fill="${c.sh}" opacity=".6"/>
+<ellipse cx="62" cy="114" rx="6" ry="9" fill="${c.skin}"/><ellipse cx="148" cy="114" rx="6" ry="9" fill="${c.skin}"/>
+<path d="${FACE}" fill="${c.skin}"/>
+<g clip-path="url(#${g}f)"><path d="${front[k]}" transform="translate(2 6)" fill="${c.sh}" opacity=".55"/></g>
+${eyes(c, m, g)}<path d="M104 127 q2 3 -1 5" stroke="${c.sh}" stroke-width="2" fill="none" stroke-linecap="round"/>${mouth(m)}${blush}${tear}
+<path d="${front[k]}" fill="url(#${g}h)"/>
+<g clip-path="url(#${g}c)"><path d="M74 70 Q84 60 98 56 M112 55 Q127 57 138 67" stroke="#fff" stroke-opacity=".32" stroke-width="4.5" fill="none" stroke-linecap="round"/></g>
+${extra[k](c)}${sweat}</svg>`;
+  }
+  return { face, P };
+})();
 (() => {
   if (window.HNStory && window.HNStory.ready) return;
   const H = window.HNStory = window.HNStory || {};
@@ -455,7 +521,7 @@
   const hhmmss = ms => { const s = Math.ceil(ms / 1000); return [s / 3600 | 0, (s / 60 | 0) % 60, s % 60].map(v => String(v).padStart(2, "0")).join(":"); };
 
   // ── 화면 ──
-  let opt = {}, box, cv, cx, raf, scene = "river", sub = "", who = null, timer;
+  let opt = {}, box, cv, cx, raf, scene = "river", sub = "", who = null, timer, mood = "n", moodNext = "", shown = "";
   const F = `-apple-system, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif`;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const css = `
@@ -496,12 +562,21 @@
   #stBox .cred{height:96px;overflow:hidden;position:relative;font-size:13px;color:#f3d9a4;-webkit-mask-image:linear-gradient(transparent,#000 25%,#000 75%,transparent);mask-image:linear-gradient(transparent,#000 25%,#000 75%,transparent)}
   #stBox .cred div{animation:stc 14s linear infinite}
   @keyframes stc{from{transform:translateY(96px)}to{transform:translateY(-100%)}}
-  #stBox .end{font-size:40px}`;
+  #stBox .end{font-size:40px}
+  #stBox .who{position:absolute;left:50%;bottom:31%;transition:bottom .3s;width:min(64vw,290px);transform:translateX(-50%);pointer-events:none;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+  #stBox .who svg{display:block;width:100%;height:auto;animation:stbob 3.2s ease-in-out infinite}
+  #stBox .who.in svg{animation:stwin .35s ease-out,stbob 3.2s ease-in-out .35s infinite}
+  @keyframes stbob{50%{transform:translateY(-3px)}}
+  @keyframes stwin{from{opacity:0;transform:translateY(14px) scale(.97)}}
+  #stBox.chz .who{bottom:41%}
+  @media (max-height:640px){#stBox .who{bottom:34%;width:min(52vw,230px)}#stBox.chz .who{bottom:46%}}
+  #stBox .ppl .fc{display:block;width:76px;margin:0 auto -2px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.05)}
+  #stBox .ppl .fc svg{display:block;width:100%;height:auto}`;
 
   function build() {
     const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
     box = document.createElement("div"); box.id = "stBox"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "한강, 열두 밤");
-    box.innerHTML = `<canvas></canvas><div class="ui"></div>`;
+    box.innerHTML = `<canvas></canvas><div class="who"></div><div class="ui"></div>`;
     document.body.appendChild(box);
     cv = box.querySelector("canvas"); cx = cv.getContext("2d");
     addEventListener("resize", size); size();
@@ -536,13 +611,22 @@
     if (scene === "rain") { cx.strokeStyle = "rgba(180,200,230,.35)"; cx.lineWidth = 1; cx.beginPath(); for (const [x, y, s] of RAIN) { const yy = ((y + t * s) % 1) * Hh, xx = x * W; cx.moveTo(xx, yy); cx.lineTo(xx - 3, yy + 14); } cx.stroke(); }
     if (scene === "fire") { if (Math.random() < .03 || bursts.length === 0) bursts.push({ x: W * (.2 + Math.random() * .6), y: Hh * (.12 + Math.random() * .25), t, c: ["#ffd27a", "#ff9fb6", "#8fd3ff", "#b8f28a"][Math.random() * 4 | 0] }); bursts = bursts.filter(b => t - b.t < 2.2);
       for (const b of bursts) { const k = (t - b.t) / 2.2, r = 10 + k * 70; cx.globalAlpha = 1 - k; cx.fillStyle = b.c; for (let i = 0; i < 24; i++) { const a = i / 24 * 6.283; cx.beginPath(); cx.arc(b.x + Math.cos(a) * r, b.y + Math.sin(a) * r + k * k * 20, 2, 0, 7); cx.fill(); } } cx.globalAlpha = 1; }
-    // 말하는 사람 실루엣
-    if (who && CH[who]) { const c = CH[who], x = W / 2, y = hz + 2, bob = Math.sin(t * 1.6) * 1.5;
-      g = cx.createRadialGradient(x, y - 50, 4, x, y - 50, 120); g.addColorStop(0, c.col + "55"); g.addColorStop(1, c.col + "00"); cx.fillStyle = g; cx.fillRect(x - 120, y - 170, 240, 240);
-      cx.fillStyle = "#0b0d22"; cx.beginPath(); cx.arc(x, y - 92 + bob, 17, 0, 7); cx.fill(); cx.beginPath(); cx.moveTo(x - 26, y); cx.quadraticCurveTo(x - 28, y - 66 + bob, x, y - 70 + bob); cx.quadraticCurveTo(x + 28, y - 66 + bob, x + 26, y); cx.fill();
-      cx.strokeStyle = c.col; cx.globalAlpha = .7; cx.lineWidth = 1.5; cx.beginPath(); cx.arc(x, y - 92 + bob, 17, 0, 7); cx.stroke(); cx.globalAlpha = 1;
-      cx.font = `30px ${F}`; cx.textAlign = "center"; cx.fillText(c.e, x + 34, y - 30 + bob); }
+    // 말하는 사람 뒤 빛(그림은 .who 층에 SVG로)
+    if (who && CH[who]) { const c = CH[who], x = W / 2, y = Hh * (box.classList.contains("chz") ? .59 : .69) - Math.min(W * .64, 290) * .66;
+      g = cx.createRadialGradient(x, y, 10, x, y, 190); g.addColorStop(0, c.col + "40"); g.addColorStop(1, c.col + "00"); cx.fillStyle = g; cx.fillRect(x - 190, y - 190, 380, 380); }
+    paint();
   }
+  // 인물 그림: 말하는 사람 + 표정이 바뀔 때만 다시 그림
+  function paint() {
+    const el = box && box.querySelector(".who"); if (!el) return;
+    const key = who && CH[who] ? who + mood : "";
+    if (key === shown) return;
+    const sameP = shown && key && shown[0] === key[0];
+    shown = key; el.innerHTML = key ? window.HNChar.face(who, mood) : "";
+    el.classList.toggle("in", !sameP); 
+  }
+  const MOODS = [["b", /얼굴이 빨|붉어|부끄|수줍|시선을 피|귀가 빨|눈을 못/], ["d", /미안|울먹|눈물|슬퍼|슬프|힘들|아파|떠나|그만둘|못 할|한숨/], ["o", /어\?|헉|앗|!\?|뭐야|깜짝|놀라|진짜요\?/], ["s", /웃|ㅋㅋ|ㅎㅎ|하하|고마|좋아|다행|반가/]];
+  function moodOf(t) { for (const [m, re] of MOODS) if (re.test(t)) return m; return ""; }
   function loop(t) { draw(t); raf = requestAnimationFrame(loop); }
 
   // ── 진행 ──
@@ -560,9 +644,11 @@
     const ln = L[i++];
     if (Array.isArray(ln)) return choose(ln);
     const k = ln[0], body = ln.slice(2);
-    if (k === "@") { const [s, c] = body.split("|"); scene = s; sub = c || ""; who = null; return step(); }
+    if (k === "@") { const [s, c] = body.split("|"); scene = s; sub = c || ""; who = null; mood = "n"; return step(); }
     const sp = k === "c" ? S.r : k;
     who = sp === "n" || sp === "y" ? who : sp;
+    box.classList.remove("chz");
+    if (CH[sp]) { mood = moodOf(body) || moodNext || "n"; moodNext = ""; }
     const isN = sp === "n", nm = isN ? "" : nameOf(sp), col = sp === "y" ? "#f3d9a4" : CH[sp] ? CH[sp].col : "";
     ui().innerHTML = top(`<div class="sp"></div>${isN ? "" : `<div class="nm" style="background:${col}">${esc(nm)}</div>`}<div class="msg ${isN ? "nar" : ""}" data-do="next"><span class="tx"></span><span class="go">▼</span></div>`);
     const tx = ui().querySelector(".tx"), full = isN ? body : body; let n = 0;
@@ -571,7 +657,7 @@
     box._last = { isN, nm, col, full };
   }
   function choose(ln) {
-    const opts = ln.slice(1);
+    const opts = ln.slice(1); box.classList.add("chz");
     const l = box._last;
     const ctx = l ? `${l.isN ? "" : `<div class="nm" style="background:${l.col}">${esc(l.nm)}</div>`}<div class="msg ${l.isN ? "nar" : ""}">${esc(l.full)}</div>` : "";
     ui().innerHTML = top(`<div class="sp"></div>${ctx}<div class="chs">${opts.map((o, k) => `<button data-do="ch" data-k="${k}" style="animation-delay:${k * .07}s"><b>${"①②③"[k]}</b>${esc(o[0])}</button>`).join("")}</div>`);
@@ -582,6 +668,8 @@
     if (v && typeof v === "object" && v.pick) { S.r = v.pick; }
     else if (typeof v === "number") { if (S.ep === 12) S.last = v; S.h[S.r] = (S.h[S.r] || 0) + v; if (v > 0) pop(`${CH[S.r].e} ♡ +${v}`); }
     else if (v) for (const c in v) { S.h[c] = (S.h[c] || 0) + v[c]; if (v[c] > 0) pop(`${CH[c].e} ♡ +${v[c]}`); }
+    const gain = typeof v === "number" ? v : v && !v.pick ? Math.max(...Object.values(v)) : 0;
+    moodNext = v && v.pick ? "s" : gain >= 8 ? "b" : gain > 0 ? "s" : "";
     save();
     if (o[2]) L.splice(i, 0, o[2]);
     step();
@@ -603,7 +691,7 @@
   }
   function supBox(msg) { return `<div class="sup">💛 ${msg}<button data-do="sup">응원하기</button></div>`; }
   function ending(k) {
-    const c = CH[S.r], e = ENDS[k]; scene = k === "ok" ? "fire" : "river"; who = S.r; sub = "";
+    const c = CH[S.r], e = ENDS[k]; scene = k === "ok" ? "fire" : "river"; who = S.r; sub = ""; mood = k === "ok" ? "b" : k === "mid" ? "n" : "s";
     const seen = Object.keys(S.ends).length;
     ui().innerHTML = `<div class="top"><span class="t">🌙 한강, 열두 밤 · 엔딩</span><button class="x" data-do="close" aria-label="닫기">✕</button></div>
       <div class="card"><div class="end">${e[0]}</div><h2>${esc(c.n)} · ${e[1]}</h2><p>열두 밤 동안 ${c.e} ♡ ${S.h[S.r]}</p>
@@ -615,8 +703,8 @@
   function cover() {
     clearInterval(timer);
     if (S.ep > 12) return ending(S.ends[S.done] || "fr");
-    const d = epData(), wait = left(); who = S.r && S.ep > 1 ? S.r : null; scene = "river"; sub = "";
-    const ppl = Object.keys(CH).map(k => `<div class="${S.r === k ? "me" : ""}"><span>${CH[k].e}</span>${CH[k].n}<small>${CH[k].who}</small>${S.ends[k] ? `<small>${ENDS[S.ends[k]][0]}</small>` : ""}</div>`).join("");
+    const d = epData(), wait = left(); who = S.r && S.ep > 1 ? S.r : null; scene = "river"; sub = ""; mood = "s";
+    const ppl = Object.keys(CH).map(k => `<div class="${S.r === k ? "me" : ""}"><span class="fc">${window.HNChar.face(k, "s")}</span>${CH[k].e} ${CH[k].n}<small>${CH[k].who}</small>${S.ends[k] ? `<small>${ENDS[S.ends[k]][0]}</small>` : ""}</div>`).join("");
     ui().innerHTML = `<div class="top"><span class="t">📖 한강 이야기</span><button class="x" data-do="close" aria-label="닫기">✕</button></div>
       <div class="card"><h2>🌙 한강, 열두 밤</h2><p>매일 밤 10시, 한 화씩 열려요</p>
       ${S.ep === 1 ? `<div class="ppl">${ppl}</div>` : `<p>${CH[S.r].e} <b>${CH[S.r].n}</b>${CH[S.r].j}의 이야기 · ♡ ${S.h[S.r]}</p>`}
