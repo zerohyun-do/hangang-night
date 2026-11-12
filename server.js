@@ -227,7 +227,7 @@ const server = http.createServer((req, res) => {
   if (req.url === "/sky-stars.json" || req.url === "/sky-mw.webp") { res.writeHead(200, { "content-type": req.url.endsWith("json") ? "application/json" : "image/webp", "cache-control": "public, max-age=604800" }); return res.end(skyFiles[req.url]); }
   if (req.url === "/og.jpg" && JS_CDN) { res.writeHead(302, { location: JS_CDN + "og.jpg", "cache-control": "public, max-age=86400" }); return res.end(); }   // 링크 미리보기 그림은 jsDelivr에서
   if (req.url === "/og.jpg") { res.writeHead(200, { "content-type": "image/jpeg", "cache-control": "public, max-age=86400" }); return res.end(ogImage); }
-  if (req.url === "/radio.js" || req.url === "/menu.js" || req.url === "/trip.js" || req.url === "/voice.js" || req.url === "/focus.js" || req.url === "/skip.js" || req.url === "/drone.js" || req.url === "/guest.js" || req.url === "/busk.js" || req.url === "/sleep.js" || req.url === "/train.js" || req.url === "/store.js" || req.url === "/wx.js" || req.url === "/truck.js" || req.url === "/quiz.js" || req.url === "/night.js" || req.url === "/bench.js" || req.url === "/place.js" || req.url === "/hgi.js" || req.url === "/streak.js" || req.url === "/calm.js" || req.url === "/bubble.js" || req.url === "/capsule.js" || req.url === "/ledger.js" || req.url === "/subway.js" || req.url === "/deliv.js" || req.url === "/market.js" || req.url === "/tent.js" || req.url === "/story.js" || req.url === "/mission.js" || req.url === "/game.js" || req.url === "/busk.json" || req.url === "/radio.json") { res.writeHead(200, { "content-type": req.url.endsWith("js") ? "text/javascript; charset=utf-8" : "application/json", "cache-control": "no-cache" }); return res.end(req.url === "/radio.js" ? radioJs : req.url === "/menu.js" ? menuJs : req.url === "/trip.js" ? tripJs : req.url === "/voice.js" ? voiceJs : req.url === "/focus.js" ? focusJs : req.url === "/skip.js" ? skipJs : req.url === "/drone.js" ? droneJs : req.url === "/guest.js" ? guestJs : req.url === "/busk.js" ? buskJs : req.url === "/sleep.js" ? sleepJs : req.url === "/train.js" ? trainJs : req.url === "/store.js" ? storeJs : req.url === "/wx.js" ? wxJs : req.url === "/truck.js" ? truckJs : req.url === "/quiz.js" ? quizJs : req.url === "/night.js" ? nightJs : req.url === "/bench.js" ? benchJs : req.url === "/place.js" ? placeJs : req.url === "/hgi.js" ? hgiJs : req.url === "/streak.js" ? streakJs : req.url === "/calm.js" ? calmJs : req.url === "/bubble.js" ? bubbleJs : req.url === "/capsule.js" ? capsuleJs : req.url === "/ledger.js" ? ledgerJs : req.url === "/subway.js" ? subwayJs : req.url === "/deliv.js" ? delivJs : req.url === "/market.js" ? marketJs : req.url === "/tent.js" ? tentJs : req.url === "/story.js" ? storyJs : req.url === "/mission.js" ? missionJs : req.url === "/game.js" ? gameJs : req.url === "/busk.json" ? JSON.stringify(BUSK) : JSON.stringify(RADIO)); }
+  if (req.url === "/radio.js" || req.url === "/menu.js" || req.url === "/trip.js" || req.url === "/voice.js" || req.url === "/focus.js" || req.url === "/skip.js" || req.url === "/drone.js" || req.url === "/guest.js" || req.url === "/busk.js" || req.url === "/sleep.js" || req.url === "/train.js" || req.url === "/store.js" || req.url === "/wx.js" || req.url === "/truck.js" || req.url === "/quiz.js" || req.url === "/night.js" || req.url === "/bench.js" || req.url === "/place.js" || req.url === "/hgi.js" || req.url === "/streak.js" || req.url === "/calm.js" || req.url === "/bubble.js" || req.url === "/capsule.js" || req.url === "/ledger.js" || req.url === "/subway.js" || req.url === "/deliv.js" || req.url === "/market.js" || req.url === "/tent.js" || req.url === "/story.js" || req.url === "/mission.js" || req.url === "/game.js" || req.url === "/gift.js" || req.url === "/busk.json" || req.url === "/radio.json") { res.writeHead(200, { "content-type": req.url.endsWith("js") ? "text/javascript; charset=utf-8" : "application/json", "cache-control": "no-cache" }); return res.end(req.url === "/radio.js" ? radioJs : req.url === "/menu.js" ? menuJs : req.url === "/trip.js" ? tripJs : req.url === "/voice.js" ? voiceJs : req.url === "/focus.js" ? focusJs : req.url === "/skip.js" ? skipJs : req.url === "/drone.js" ? droneJs : req.url === "/guest.js" ? guestJs : req.url === "/busk.js" ? buskJs : req.url === "/sleep.js" ? sleepJs : req.url === "/train.js" ? trainJs : req.url === "/store.js" ? storeJs : req.url === "/wx.js" ? wxJs : req.url === "/truck.js" ? truckJs : req.url === "/quiz.js" ? quizJs : req.url === "/night.js" ? nightJs : req.url === "/bench.js" ? benchJs : req.url === "/place.js" ? placeJs : req.url === "/hgi.js" ? hgiJs : req.url === "/streak.js" ? streakJs : req.url === "/calm.js" ? calmJs : req.url === "/bubble.js" ? bubbleJs : req.url === "/capsule.js" ? capsuleJs : req.url === "/ledger.js" ? ledgerJs : req.url === "/subway.js" ? subwayJs : req.url === "/deliv.js" ? delivJs : req.url === "/market.js" ? marketJs : req.url === "/tent.js" ? tentJs : req.url === "/story.js" ? storyJs : req.url === "/mission.js" ? missionJs : req.url === "/game.js" ? gameJs : req.url === "/gift.js" ? giftJs : req.url === "/busk.json" ? JSON.stringify(BUSK) : JSON.stringify(RADIO)); }
   const rm = /^\/(radio-\d{1,2}\.mp3)(?:\?v=\d+)?$/.exec(req.url);
   if (rm && RADIO.some(x => x.f === rm[1])) return sendAudio(req, res, path.join(__dirname, rm[1]));
   const bm = /^\/(busk-\d{1,2}\.mp3)(?:\?v=\d+)?$/.exec(req.url);
@@ -269,7 +269,7 @@ function summary(d) {
   const s = [...d.secs].sort((a, b) => a - b), mid = s.length ? s[s.length >> 1] : 0;
   return { date: d.date, visits: d.visits, people: d.people.size, finished: s.length,
     avgMin: s.length ? +(s.reduce((a, b) => a + b, 0) / s.length / 60).toFixed(1) : 0, medianMin: +(mid / 60).toFixed(1),
-    over5min: s.filter(x => x >= 300).length, peak: d.peak, sources: d.sources, back: d.back || 0, fish: d.fish || 0, v: d.v || {}, fc: d.fc || undefined, sk: d.sk || undefined, dr: d.dr || 0, gs: d.gs || 0, bk: d.bk || 0, bkr: d.bkr || 0, sl: d.sl || undefined, pk: d.pk || undefined, txp: d.txp ? Object.fromEntries(Object.entries(d.txp).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => [k, Math.round(v / 1024)])) : undefined, tx: d.tx0 ? (t => ({ h: +((t.h - d.tx0.h) / 1048576).toFixed(1), w: +((t.w - d.tx0.w) / 1048576).toFixed(1) }))(d.tx1 || txNow()) : undefined, trMax: d.trMax || 0, rm: d.rm || 0, tk: d.tk || 0, qz: d.qz || 0, qzp: d.qzp || 0, px: d.px || 0, hg: d.hg || 0, stk: d.stk || 0, bub: d.bub || 0, cap: d.cap || 0, dv: d.dv || 0, mk: d.mk || 0, tn: d.tn || 0, lg: d.lg || 0, fr: d.fr || 0, tr: d.tr || 0, lvMax: d.lvMax || 0, ft: d.ft || 0, ty: d.ty || 0, tyc: d.tyc || [0, 0, 0, 0, 0, 0, 0, 0], appIn: d.appIn || 0, app: (d.sources && d.sources.app) || 0, rd: d.rd || undefined, ms: d.ms || 0, gm: d.gm || 0, gmb: d.gmb || 0 };
+    over5min: s.filter(x => x >= 300).length, peak: d.peak, sources: d.sources, back: d.back || 0, fish: d.fish || 0, v: d.v || {}, fc: d.fc || undefined, sk: d.sk || undefined, dr: d.dr || 0, gs: d.gs || 0, bk: d.bk || 0, bkr: d.bkr || 0, sl: d.sl || undefined, pk: d.pk || undefined, txp: d.txp ? Object.fromEntries(Object.entries(d.txp).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => [k, Math.round(v / 1024)])) : undefined, tx: d.tx0 ? (t => ({ h: +((t.h - d.tx0.h) / 1048576).toFixed(1), w: +((t.w - d.tx0.w) / 1048576).toFixed(1) }))(d.tx1 || txNow()) : undefined, trMax: d.trMax || 0, rm: d.rm || 0, tk: d.tk || 0, qz: d.qz || 0, qzp: d.qzp || 0, px: d.px || 0, hg: d.hg || 0, stk: d.stk || 0, bub: d.bub || 0, cap: d.cap || 0, dv: d.dv || 0, mk: d.mk || 0, tn: d.tn || 0, lg: d.lg || 0, fr: d.fr || 0, tr: d.tr || 0, lvMax: d.lvMax || 0, ft: d.ft || 0, ty: d.ty || 0, tyc: d.tyc || [0, 0, 0, 0, 0, 0, 0, 0], appIn: d.appIn || 0, app: (d.sources && d.sources.app) || 0, rd: d.rd || undefined, ms: d.ms || 0, gm: d.gm || 0, gmb: d.gmb || 0, om: d.om || 0, omb: d.omb || 0, gf: d.gf || 0, gfp: d.gfp || 0 };
 }
 function rollDay() { if (day.date !== kstDate()) { fbCount.clear(); const sm = summary(day); console.log("[stats] " + JSON.stringify(sm)); history.unshift(sm); history = history.slice(0, 7); day.tx1 = txNow(); prevDay = day; day = newDay(); } }
 setInterval(() => { rollDay(); console.log("[stats-now] " + JSON.stringify(summary(day))); }, 3600e3);   // 한 시간마다 지금까지 숫자를 로그에 남겨 둔다
@@ -403,7 +403,8 @@ for (const [u, f, ct] of [["/tarot.js", "tarot.js"], ["/level.js", "level.js"], 
 }
 const storyJs = fs.readFileSync(path.join(__dirname, "story.js"), "utf8");
 const missionJs = fs.readFileSync(path.join(__dirname, "mission.js"), "utf8");
-const gameJs = fs.readFileSync(path.join(__dirname, "game.js"), "utf8");   // ✊ 둘이 하는 놀이(01·02 공통)   // ✅ 오늘 밤 할 일(01·02 공통)   // 📖 한강, 열두 밤(01·02 공통, 누를 때만 받음)
+const gameJs = fs.readFileSync(path.join(__dirname, "game.js"), "utf8");
+const giftJs = fs.readFileSync(path.join(__dirname, "gift.js"), "utf8");   // 🎁 머문 시간 선물(01·02 공통)   // ✊ 둘이 하는 놀이(01·02 공통)   // ✅ 오늘 밤 할 일(01·02 공통)   // 📖 한강, 열두 밤(01·02 공통, 누를 때만 받음)
 const benchJs = fs.readFileSync(path.join(__dirname, "bench.js"), "utf8");   // 💛 고마운 벤치(01·02 공통)
 const nightJs = fs.readFileSync(path.join(__dirname, "night.js"), "utf8");   // 🌙 오늘 밤 카드(01·02 공통)
 const quizJs = fs.readFileSync(path.join(__dirname, "quiz.js"), "utf8");   // 🎯 한강 라이브 퀴즈(01·02 공통)
@@ -580,10 +581,14 @@ function gmRound(g, room) {
   for (const id of [g.a, g.b]) { const x = room.users.get(id); if (x) send(x.ws, msg); }
   if (g.sc[g.a] >= 2 || g.sc[g.b] >= 2 || g.n >= 9) { g.fin = 1; setTimeout(() => gmEnd(g, room, {}), 1600); }
 }
+function omFive(bd, i, c) {   // ⚫ 오목: i에 둔 돌로 다섯 개(이상)가 이어졌는지
+  const X = i % 13, Y = i / 13 | 0;
+  return [[1, 0], [0, 1], [1, 1], [1, -1]].some(([dx, dy]) => { let n = 1; for (const s of [1, -1]) { let x = X + dx * s, y = Y + dy * s; while (x >= 0 && x < 13 && y >= 0 && y < 13 && bd[y * 13 + x] === c) { n++; x += dx * s; y += dy * s; } } return n >= 5; });
+}
 function gmEnd(g, room, why) {
   if (g.over) return; g.over = 1; clearInterval(g.timer);
   const A = room.users.get(g.a), B = room.users.get(g.b); if (A && A.gm === g) A.gm = null; if (B && B.gm === g) B.gm = null;
-  const win = why.cancel ? 0 : why.quit ? (why.quit === g.a ? g.b : g.a) : g.sc[g.a] > g.sc[g.b] ? g.a : g.sc[g.b] > g.sc[g.a] ? g.b : 0;
+  const win = why.cancel ? 0 : why.quit ? (why.quit === g.a ? g.b : g.a) : why.win !== undefined ? why.win : g.sc[g.a] > g.sc[g.b] ? g.a : g.sc[g.b] > g.sc[g.a] ? g.b : 0;
   const msg = { t: "gmEnd", a: g.a, b: g.b, k: g.k, win, sc: [g.sc[g.a], g.sc[g.b]], quit: why.quit, cancel: why.cancel ? 1 : undefined };
   for (const x of [A, B]) if (x) send(x.ws, msg);
   if (win && room.users.has(win)) broadcast(room, { t: "emo", id: win, e: "✨" });   // 이긴 사람 머리 위 반짝(방 모두에게)
@@ -892,7 +897,7 @@ wss.on("connection", (ws, req) => {
     } else if (m.t === "vc" && VC_KEYS.includes(m.k)) {
       // 💌 우체통·📝 바라는 점 이용 횟수만 센다(글은 안 옴). 한 사람이 한 종류를 30번 넘게 세지 않게
       u.vc = u.vc || {}; if ((u.vc[m.k] = (u.vc[m.k] || 0) + 1) <= 30) day.v[m.k] = (day.v[m.k] || 0) + 1;
-    } else if (m.t === "gm" && (m.k === "rps" || m.k === "ccc") && Number.isInteger(m.to) && m.to !== u.id && room.users.has(m.to)) {   // ✊ 둘이 하는 놀이(game.js): 신청
+    } else if (m.t === "gm" && (m.k === "rps" || m.k === "ccc" || m.k === "omok") && Number.isInteger(m.to) && m.to !== u.id && room.users.has(m.to)) {   // ✊ 둘이 하는 놀이(game.js): 신청
       const now = Date.now(); if (u.gm || now - (u.lastGm || 0) < 4000) return; u.lastGm = now;
       const o = room.users.get(m.to); if (o.gm) return send(ws, { t: "gmNo", from: o.id, busy: 1 });
       u.gmAsk = { to: o.id, k: m.k, at: now }; send(o.ws, { t: "gmInv", from: u.id, nick: u.nick, k: m.k });
@@ -900,13 +905,23 @@ wss.on("connection", (ws, req) => {
       const o = room.users.get(m.to);
       if (!o.gmAsk || o.gmAsk.to !== u.id || Date.now() - o.gmAsk.at > 20000 || o.gm || u.gm) return send(ws, { t: "gmEnd", cancel: 1 });
       const g = { a: o.id, b: u.id, k: o.gmAsk.k, sc: { [o.id]: 0, [u.id]: 0 }, n: 0, p: {}, at: Date.now() }; o.gmAsk = null; o.gm = u.gm = g; day.gm = (day.gm || 0) + 1;
-      g.timer = setInterval(() => { if (Date.now() - g.at > 25000) gmEnd(g, room, { cancel: 1 }); }, 5000);   // 25초 동안 아무도 안 고르면 끝
+      if (g.k === "omok") { g.bd = new Array(169).fill(0); g.turn = g.a; day.om = (day.om || 0) + 1; g.timer = setInterval(() => { if (Date.now() - g.at > 90000) gmEnd(g, room, { quit: g.turn }); }, 5000); }   // ⚫ 오목: 90초 동안 안 두면 그 사람이 진다
+      else g.timer = setInterval(() => { if (Date.now() - g.at > 25000) gmEnd(g, room, { cancel: 1 }); }, 5000);   // 25초 동안 아무도 안 고르면 끝
       const msg = { t: "gmGo", a: g.a, b: g.b, k: g.k, an: o.nick, bn: u.nick }; send(o.ws, msg); send(ws, msg);
     } else if (m.t === "gmNo" && Number.isInteger(m.to) && room.users.has(m.to)) {
       const o = room.users.get(m.to); if (o.gmAsk && o.gmAsk.to === u.id) { o.gmAsk = null; send(o.ws, { t: "gmNo", from: u.id }); }
     } else if (m.t === "gmPick" && u.gm && !u.gm.fin && [0, 1, 2].includes(m.p) && u.gm.p[u.id] == null) {
       const g = u.gm; g.p[u.id] = m.p; g.at = Date.now(); const o = room.users.get(g.a === u.id ? g.b : g.a); if (o) send(o.ws, { t: "gmWait" });
       if (g.p[g.a] != null && g.p[g.b] != null) gmRound(g, room);
+    } else if (m.t === "gmMv" && u.gm && u.gm.k === "omok" && !u.gm.fin && u.gm.turn === u.id && Number.isInteger(m.x) && m.x >= 0 && m.x < 169 && !u.gm.bd[m.x]) {   // ⚫ 오목 한 수
+      const g = u.gm, c = u.id === g.a ? 1 : 2, o = g.a === u.id ? g.b : g.a; g.bd[m.x] = c; g.n++; g.turn = o; g.at = Date.now();
+      const msg = { t: "gmMv", x: m.x, c, n: g.n }; for (const id of [g.a, g.b]) { const x = room.users.get(id); if (x) send(x.ws, msg); }
+      if (omFive(g.bd, m.x, c)) { g.fin = 1; g.sc[u.id] = 1; setTimeout(() => gmEnd(g, room, { win: u.id }), 1200); }
+      else if (g.n >= 169) { g.fin = 1; setTimeout(() => gmEnd(g, room, { win: 0 }), 1200); }
+    } else if (m.t === "gmBotOm" && !u.gmBotOm) {   // ⚫ 한강이랑 오목(폰 안, 통계용 접속당 1번)
+      u.gmBotOm = 1; day.omb = (day.omb || 0) + 1;
+    } else if (m.t === "gf" && Number.isInteger(m.n) && m.n >= 1 && m.n <= 60) {   // 🎁 머문 시간 엽서(gift.js) 받음: 접속당 20번까지 센다
+      u.gf = (u.gf || 0) + 1; if (u.gf <= 20) { day.gf = (day.gf || 0) + 1; if (u.gf === 1) day.gfp = (day.gfp || 0) + 1; }
     } else if (m.t === "gmQuit" && u.gm) {
       gmEnd(u.gm, room, { quit: u.id });
     } else if (m.t === "gmBot" && !u.gmBot) {   // 🐶 한강이랑 한 판(폰 안에서만, 통계용 접속당 1번)
