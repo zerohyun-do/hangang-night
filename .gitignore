@@ -1,3 +1,4 @@
 node_modules
 feedback.json
 tools/__pycache__/
+srv.log
