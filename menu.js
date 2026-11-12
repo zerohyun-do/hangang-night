@@ -47,14 +47,14 @@
       const HID = window.HNHide || [];   // 🗓 80차: 아직 공개 전인 기능(server.js REVEAL)은 판에서 뺀다
       (extra || []).forEach(e => { if (typeof e === "string") return head(e); const [icon, name, fn, id] = e; if (HID.includes(name)) return; const b = document.createElement("button"); if (id) b.id = id; b.innerHTML = `${icon}<span>${name}</span>`; b.onclick = fn; sheet.appendChild(b); });
       [...sheet.querySelectorAll("small")].forEach(h => { const n = h.nextElementSibling; if (!n || n.tagName === "SMALL") h.remove(); });   // 다 숨겨진 묶음 제목은 지운다
-      let matHead = null, admHead = null;
+      let matHead = null, admHead = null; const matAt = sheet.querySelectorAll("small")[1] || null;   // 🧺 돗자리에서 묶음은 첫 묶음 바로 뒤에
       const place = el => {
         if (el === moreB) return;
         if (el.tagName !== "BUTTON") { if (el.classList.contains("sep")) el.remove(); return; }
         if (keep(el)) return;
         if (el.classList.contains("admin")) { if (!admHead) admHead = head("👑 운영자"); sheet.appendChild(el); return; }
-        if (!matHead) matHead = head("🧺 돗자리에서");
-        if (admHead) sheet.insertBefore(el, admHead); else sheet.appendChild(el);
+        if (!matHead) { matHead = head("🧺 돗자리에서"); if (matAt) sheet.insertBefore(matHead, matAt); }
+        if (matAt) sheet.insertBefore(el, matAt); else if (admHead) sheet.insertBefore(el, admHead); else sheet.appendChild(el);
       };
       [...bar.children].forEach(place);
       bar.appendChild(moreB);
