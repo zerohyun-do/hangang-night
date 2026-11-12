@@ -19,7 +19,7 @@
     ["skMenuBtn", "🪨", "물수제비 던지기"], ["qzMenuBtn", "🎯", "한강 퀴즈 풀기"], ["plMenuBtn", "🎨", "같이 그리기에 한 칸 칠하기"], ["hgMenuBtn", "🐶", "한강이 보러 가기"],
     ["bbMenuBtn", "🫧", "비눗방울 불기"], ["bkMenuBtn", "🎸", "버스킹 들으러 가기"], ["stMenuBtn", "🏪", "편의점 들르기"], ["mkMenuBtn", "🏮", "야시장 구경하기"],
     ["tnMenuBtn", "⛺", "내 자리 꾸미기"], ["pkMenuBtn", "🗺", "오픈월드 걸어 보기"], ["cruiseMenuBtn", "🚢", "유람선 타기"], ["towerMenuBtn", "🗼", "남산타워 올라가기"],
-    ["rdMenuBtn", "📻", "한강 라디오 듣기"], ["hvMindBtn", "💌", "우체통에 마음 털어놓기"], ["cpMenuBtn", "⏳", "미래의 나에게 편지 쓰기"], ["dvMenuBtn", "🛵", "치킨 배달 시켜 보기"], ["gmMenuBtn", "✊", "한강이랑 가위바위보 한 판"],
+    ["rdMenuBtn", "📻", "한강 라디오 듣기"], ["hvMindBtn", "💌", "우체통에 마음 털어놓기"], ["cpMenuBtn", "⏳", "미래의 나에게 편지 쓰기"], ["dvMenuBtn", "🛵", "치킨 배달 시켜 보기"], ["gmMenuBtn", "✊", "한강이랑 가위바위보 한 판"], ["omMenuBtn", "⚫", "한강이랑 오목 한 판"], ["wcMenuBtn", "🔤", "끝말잇기 한 단어 잇기"], ["gfMenuBtn", "🎁", "엽서 도감 열어 보기"],
   ];
   const all = () => DO.map(d => ({ k: d[0], e: d[1], t: d[2], ok: d[3], go: d[4] })).concat(SEE.map(s => ({ k: s[0], e: s[1], t: s[2], click: s[0], go: "#" + s[0] })));
   const byK = k => all().find(x => x.k === k);
