@@ -208,7 +208,7 @@ const server = http.createServer((req, res) => {
   }
   if (req.url === "/stats") {
     res.writeHead(200, { "content-type": "application/json" });
-    return res.end(JSON.stringify({ total: total(), rooms: rooms.map(r => r.users.size), rooms3d: rooms3d.map(r => r.users.size), today: summary(day), yesterday: prevDay && summary(prevDay), days: history, since: startedAt }, null, 1));
+    return res.end(JSON.stringify({ total: total(), rooms: rooms.map(r => r.users.size), rooms3d: rooms3d.map(r => r.users.size), today: summary(day), yesterday: prevDay ? summary(prevDay) : prevSum, days: history, since: startedAt, saved: statLoaded ? (statErr || "ok") : (statErr || "loading") }, null, 1));
   }
   if (/^\/3d(\?|$)/.test(req.url)) { res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" }); return res.end(pages().d3); }
   const vm = /^\/vendor\/(three\.(?:module|core)\.js)$/.exec(req.url);
@@ -264,14 +264,14 @@ function sendAudio(req, res, AUDIO) {
 const kstDate = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 const newDay = () => ({ date: kstDate(), tx0: txNow(), visits: 0, people: new Set(), secs: [], peak: 0, sources: {}, back: 0, fish: 0, v: {}, fc: { s: 0, d: 0, min: 0 }, sk: { o: 0, t: 0, sh: 0 } });
 const startedAt = new Date().toISOString();   // 이 서버가 켜진 때(숫자는 이때부터 센다)
-let day = newDay(), prevDay = null, history = [];   // history: 지난 날 요약(최근 7일, 메모리에만 — 재시작·배포 때 지워지고 Render 로그 [stats] 줄이 남는다)
+let day = newDay(), prevDay = null, prevSum = null, history = [];   // history: 지난 날 요약(최근 7일, 메모리에만 — 재시작·배포 때 지워지고 Render 로그 [stats] 줄이 남는다)
 function summary(d) {
   const s = [...d.secs].sort((a, b) => a - b), mid = s.length ? s[s.length >> 1] : 0;
   return { date: d.date, visits: d.visits, people: d.people.size, finished: s.length,
     avgMin: s.length ? +(s.reduce((a, b) => a + b, 0) / s.length / 60).toFixed(1) : 0, medianMin: +(mid / 60).toFixed(1),
-    over5min: s.filter(x => x >= 300).length, peak: d.peak, sources: d.sources, back: d.back || 0, fish: d.fish || 0, v: d.v || {}, fc: d.fc || undefined, sk: d.sk || undefined, dr: d.dr || 0, gs: d.gs || 0, bk: d.bk || 0, bkr: d.bkr || 0, sl: d.sl || undefined, pk: d.pk || undefined, txp: d.txp ? Object.fromEntries(Object.entries(d.txp).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => [k, Math.round(v / 1024)])) : undefined, tx: d.tx0 ? (t => ({ h: +((t.h - d.tx0.h) / 1048576).toFixed(1), w: +((t.w - d.tx0.w) / 1048576).toFixed(1) }))(d.tx1 || txNow()) : undefined, trMax: d.trMax || 0, rm: d.rm || 0, tk: d.tk || 0, qz: d.qz || 0, qzp: d.qzp || 0, px: d.px || 0, hg: d.hg || 0, stk: d.stk || 0, bub: d.bub || 0, cap: d.cap || 0, dv: d.dv || 0, mk: d.mk || 0, tn: d.tn || 0, lg: d.lg || 0, fr: d.fr || 0, tr: d.tr || 0, lvMax: d.lvMax || 0, ft: d.ft || 0, ty: d.ty || 0, tyc: d.tyc || [0, 0, 0, 0, 0, 0, 0, 0], appIn: d.appIn || 0, app: (d.sources && d.sources.app) || 0, rd: d.rd || undefined, ms: d.ms || 0, gm: d.gm || 0, gmb: d.gmb || 0 };
+    over5min: s.filter(x => x >= 300).length, peak: d.peak, sources: d.sources, back: d.back || 0, fish: d.fish || 0, v: d.v || {}, fc: d.fc || undefined, sk: d.sk || undefined, dr: d.dr || 0, gs: d.gs || 0, bk: d.bk || 0, bkr: d.bkr || 0, sl: d.sl || undefined, pk: d.pk || undefined, txp: d.txp ? Object.fromEntries(Object.entries(d.txp).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => [k, Math.round(v / 1024)])) : undefined, tx: d.tx0 ? (t => ({ h: +((t.h - d.tx0.h) / 1048576 + ((d.txAdd && d.txAdd.h) || 0)).toFixed(1), w: +((t.w - d.tx0.w) / 1048576 + ((d.txAdd && d.txAdd.w) || 0)).toFixed(1) }))(d.tx1 || txNow()) : undefined, trMax: d.trMax || 0, rm: d.rm || 0, tk: d.tk || 0, qz: d.qz || 0, qzp: d.qzp || 0, px: d.px || 0, hg: d.hg || 0, stk: d.stk || 0, bub: d.bub || 0, cap: d.cap || 0, dv: d.dv || 0, mk: d.mk || 0, tn: d.tn || 0, lg: d.lg || 0, fr: d.fr || 0, tr: d.tr || 0, lvMax: d.lvMax || 0, ft: d.ft || 0, ty: d.ty || 0, tyc: d.tyc || [0, 0, 0, 0, 0, 0, 0, 0], appIn: d.appIn || 0, app: (d.sources && d.sources.app) || 0, rd: d.rd || undefined, ms: d.ms || 0, gm: d.gm || 0, gmb: d.gmb || 0 };
 }
-function rollDay() { if (day.date !== kstDate()) { fbCount.clear(); const sm = summary(day); console.log("[stats] " + JSON.stringify(sm)); history.unshift(sm); history = history.slice(0, 7); day.tx1 = txNow(); prevDay = day; day = newDay(); } }
+function rollDay() { if (day.date !== kstDate()) { fbCount.clear(); const sm = summary(day); console.log("[stats] " + JSON.stringify(sm)); history.unshift(sm); history = history.slice(0, 7); day.tx1 = txNow(); prevDay = day; prevSum = null; day = newDay(); statSave("d:" + sm.date, sm); statSaveLive(true); } }
 setInterval(() => { rollDay(); console.log("[stats-now] " + JSON.stringify(summary(day))); }, 3600e3);   // 한 시간마다 지금까지 숫자를 로그에 남겨 둔다
 setInterval(() => { rollDay(); if (new Date().getMinutes() === 0) console.log("[stats] " + JSON.stringify(summary(day))); }, 60000);
 // 💛 응원 폭죽: 후원 링크를 연 사람이 '응원 폭죽'을 누르면 01 전체에 알림 + 그 방에 황금 폭죽 3발. 결제 확인은 못 하므로 IP당 10분에 1번
@@ -362,6 +362,58 @@ async function supLoad() {
   } catch (e) { supPersistErr = "불러오기 실패"; console.log("[응원기록 불러오기실패] " + e.message); }
 }
 supLoad();
+// 📊 접속 집계 영구 저장: Render는 배포·재시작 때 메모리가 지워지므로 오늘 숫자(day)·어제·지난 7일을 Supabase hangang_stats 표에 5분마다(바뀌었을 때만) 저장하고,
+// 켜질 때 불러와 지금 숫자에 더한다. 날짜가 바뀌면 그날 요약을 "d:날짜" 줄로 따로 남겨 7일이 지나도 남는다. 표 접근은 응원 기록과 같은 비밀값 함수로만.
+const STAT_MAX = { peak: 1, trMax: 1, lvMax: 1 }, STAT_SKIP = { date: 1, tx0: 1, tx1: 1 };
+let statLoaded = false, statErr = "", statLastJson = "";
+function statMerge(a, b) {   // b(불러온 값)를 a(지금 값)에 더한다
+  for (const k of Object.keys(b)) { const x = b[k], y = a[k];
+    if (STAT_SKIP[k] || x == null) continue;
+    if (k === "people") { for (const h of x) a.people.add(h); continue; }
+    if (typeof x === "number") a[k] = STAT_MAX[k] ? Math.max(y || 0, x) : (typeof y === "number" ? y : 0) + x;
+    else if (Array.isArray(x)) a[k] = k === "secs" ? (y || []).concat(x).slice(0, 20000) : Array.isArray(y) ? y.map((v, i) => (+v || 0) + (+x[i] || 0)).concat(x.slice(y.length)) : x.slice();
+    else if (typeof x === "object") { if (!y || typeof y !== "object") a[k] = {}; statMerge(a[k], x); }
+    else if (y === undefined) a[k] = x; }
+}
+function statPayload() {
+  const t = summary(day).tx; const d = { ...day, people: [...day.people], tx0: undefined, tx1: undefined, txAdd: t };
+  return { day: d, prev: prevDay ? summary(prevDay) : prevSum, history, at: new Date().toISOString() };
+}
+function statSave(k, v) {
+  if (!SB_URL || !SB_KEY || !SB_SECRET) return Promise.resolve();
+  return fetch(SB_URL + "/rest/v1/rpc/hangang_stats_put", { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify({ p_secret: SB_SECRET, p_k: k, p_v: v }) })
+    .then(r => { if (!r.ok) { statErr = "저장 실패 " + r.status; console.log("[집계 저장실패] " + k + " " + r.status); } else statErr = ""; }).catch(e => { statErr = "저장 실패"; console.log("[집계 저장실패] " + e.message); });
+}
+function statSaveLive(force) {
+  if (!statLoaded) return Promise.resolve();   // 불러오기 전에 저장하면 예전 숫자를 덮어쓴다
+  const p = statPayload(), j = JSON.stringify({ v: p.day.visits, s: p.day.secs.length, n: p.day.people.length, h: p.history.length, d: p.day.date });
+  if (!force && j === statLastJson) return Promise.resolve(); statLastJson = j;
+  return statSave("live", p);
+}
+async function statLoad() {
+  if (!SB_URL || !SB_KEY || !SB_SECRET) { statErr = "저장소 없음"; return; }
+  for (let i = 0; i < 5 && !supLoaded && !supPersistErr; i++) await new Promise(r => setTimeout(r, 1000));   // 비밀값 등록(hangang_claim)이 먼저 끝나게
+  try {
+    const r = await fetch(SB_URL + "/rest/v1/rpc/hangang_stats_get", { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_secret: SB_SECRET }) });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const all = (await r.json()) || {}, live = all.live;
+    const archived = Object.keys(all).filter(k => k.startsWith("d:")).sort().reverse().map(k => all[k]);
+    rollDay();
+    if (live && live.day) {
+      if (live.day.date === day.date) { statMerge(day, live.day); if (live.prev && !prevDay) prevSum = live.prev; if (Array.isArray(live.history) && !history.length) history = live.history.slice(0, 7); }
+      else {   // 꺼져 있는 사이 날짜가 바뀜: 그날 숫자를 요약해 어제·지난 날로 넘긴다
+        const old = { ...newDay(), date: live.day.date }; old.tx0 = null; statMerge(old, live.day); const sm = summary(old);
+        if (!prevDay) prevSum = sm; history = [sm].concat((live.history || []).filter(x => x.date !== sm.date)).slice(0, 7);
+        console.log("[stats] " + JSON.stringify(sm)); statSave("d:" + sm.date, sm);
+      }
+    }
+    if (archived.length) { const have = new Set(history.map(x => x.date)); history = history.concat(archived.filter(x => x && x.date !== day.date && !have.has(x.date))).sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 7); }
+    statLoaded = true; statErr = ""; console.log("[집계] 불러옴 " + (live ? live.day.date + " 방문 " + live.day.visits + " · 사람 " + (live.day.people || []).length : "없음(처음)") + " · 지난 날 " + archived.length + "개");
+    statSaveLive(true);
+  } catch (e) { statErr = "불러오기 실패"; console.log("[집계 불러오기실패] " + e.message + " — 1분 뒤 다시"); setTimeout(statLoad, 60e3); }
+}
+statLoad();
+setInterval(() => { rollDay(); statSaveLive(false); }, 5 * 60e3);   // 5분마다, 숫자가 바뀌었을 때만
 function supReport() {
   const kd = t => new Date(new Date(t).getTime() + 9 * 3600e3).toISOString().slice(0, 10), today = kstDate(), now = Date.now();
   const sum = arr => ({ n: arr.length, amt: arr.reduce((a, x) => a + (x.amt || 0), 0), people: new Set(arr.map(x => x.nick)).size });
@@ -1008,7 +1060,8 @@ process.on("SIGTERM", () => {
   for (const x of bb.pend) console.log("[전광판신청 보관] " + JSON.stringify(x));
   for (const x of bb.live) console.log("[전광판게시 보관] " + JSON.stringify(x));
   for (const r of rooms) broadcast(r, { t: "restart" });
-  setTimeout(() => { for (const c of wss.clients) c.close(1012, "restart"); setTimeout(() => process.exit(0), 300); }, 200);
+  const saved = Promise.race([statSaveLive(true), new Promise(r => setTimeout(r, 4000))]);   // 꺼지기 전에 오늘 숫자를 DB에 한 번 더(최대 4초)
+  setTimeout(() => { for (const c of wss.clients) c.close(1012, "restart"); saved.then(() => setTimeout(() => process.exit(0), 300)); }, 200);
 });
 server.on("connection", s => { txSocks.add(s); s.on("close", () => { txSocks.delete(s); txDone[s.hnWs ? "w" : "h"] += s.bytesWritten - (s.hnBase || 0); }); });
 server.on("upgrade", (req, s) => { if (s.hnWs) return; txDone.h += s.bytesWritten - (s.hnBase || 0); s.hnBase = s.bytesWritten; s.hnWs = 1; });
