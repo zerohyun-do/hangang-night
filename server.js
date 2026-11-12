@@ -227,7 +227,7 @@ const server = http.createServer((req, res) => {
   if (req.url === "/sky-stars.json" || req.url === "/sky-mw.webp") { res.writeHead(200, { "content-type": req.url.endsWith("json") ? "application/json" : "image/webp", "cache-control": "public, max-age=604800" }); return res.end(skyFiles[req.url]); }
   if (req.url === "/og.jpg" && JS_CDN) { res.writeHead(302, { location: JS_CDN + "og.jpg", "cache-control": "public, max-age=86400" }); return res.end(); }   // 링크 미리보기 그림은 jsDelivr에서
   if (req.url === "/og.jpg") { res.writeHead(200, { "content-type": "image/jpeg", "cache-control": "public, max-age=86400" }); return res.end(ogImage); }
-  if (req.url === "/radio.js" || req.url === "/menu.js" || req.url === "/trip.js" || req.url === "/voice.js" || req.url === "/focus.js" || req.url === "/skip.js" || req.url === "/drone.js" || req.url === "/guest.js" || req.url === "/busk.js" || req.url === "/sleep.js" || req.url === "/train.js" || req.url === "/store.js" || req.url === "/wx.js" || req.url === "/truck.js" || req.url === "/quiz.js" || req.url === "/night.js" || req.url === "/bench.js" || req.url === "/place.js" || req.url === "/hgi.js" || req.url === "/streak.js" || req.url === "/calm.js" || req.url === "/bubble.js" || req.url === "/capsule.js" || req.url === "/ledger.js" || req.url === "/subway.js" || req.url === "/deliv.js" || req.url === "/market.js" || req.url === "/tent.js" || req.url === "/story.js" || req.url === "/mission.js" || req.url === "/game.js" || req.url === "/gift.js" || req.url === "/busk.json" || req.url === "/radio.json") { res.writeHead(200, { "content-type": req.url.endsWith("js") ? "text/javascript; charset=utf-8" : "application/json", "cache-control": "no-cache" }); return res.end(req.url === "/radio.js" ? radioJs : req.url === "/menu.js" ? menuJs : req.url === "/trip.js" ? tripJs : req.url === "/voice.js" ? voiceJs : req.url === "/focus.js" ? focusJs : req.url === "/skip.js" ? skipJs : req.url === "/drone.js" ? droneJs : req.url === "/guest.js" ? guestJs : req.url === "/busk.js" ? buskJs : req.url === "/sleep.js" ? sleepJs : req.url === "/train.js" ? trainJs : req.url === "/store.js" ? storeJs : req.url === "/wx.js" ? wxJs : req.url === "/truck.js" ? truckJs : req.url === "/quiz.js" ? quizJs : req.url === "/night.js" ? nightJs : req.url === "/bench.js" ? benchJs : req.url === "/place.js" ? placeJs : req.url === "/hgi.js" ? hgiJs : req.url === "/streak.js" ? streakJs : req.url === "/calm.js" ? calmJs : req.url === "/bubble.js" ? bubbleJs : req.url === "/capsule.js" ? capsuleJs : req.url === "/ledger.js" ? ledgerJs : req.url === "/subway.js" ? subwayJs : req.url === "/deliv.js" ? delivJs : req.url === "/market.js" ? marketJs : req.url === "/tent.js" ? tentJs : req.url === "/story.js" ? storyJs : req.url === "/mission.js" ? missionJs : req.url === "/game.js" ? gameJs : req.url === "/gift.js" ? giftJs : req.url === "/busk.json" ? JSON.stringify(BUSK) : JSON.stringify(RADIO)); }
+  if (req.url === "/radio.js" || req.url === "/menu.js" || req.url === "/trip.js" || req.url === "/voice.js" || req.url === "/focus.js" || req.url === "/skip.js" || req.url === "/drone.js" || req.url === "/guest.js" || req.url === "/busk.js" || req.url === "/sleep.js" || req.url === "/train.js" || req.url === "/store.js" || req.url === "/wx.js" || req.url === "/truck.js" || req.url === "/quiz.js" || req.url === "/night.js" || req.url === "/bench.js" || req.url === "/place.js" || req.url === "/hgi.js" || req.url === "/streak.js" || req.url === "/calm.js" || req.url === "/bubble.js" || req.url === "/capsule.js" || req.url === "/ledger.js" || req.url === "/subway.js" || req.url === "/deliv.js" || req.url === "/market.js" || req.url === "/tent.js" || req.url === "/story.js" || req.url === "/mission.js" || req.url === "/game.js" || req.url === "/gift.js" || req.url === "/wc.js" || req.url === "/busk.json" || req.url === "/radio.json") { res.writeHead(200, { "content-type": req.url.endsWith("js") ? "text/javascript; charset=utf-8" : "application/json", "cache-control": "no-cache" }); return res.end(req.url === "/radio.js" ? radioJs : req.url === "/menu.js" ? menuJs : req.url === "/trip.js" ? tripJs : req.url === "/voice.js" ? voiceJs : req.url === "/focus.js" ? focusJs : req.url === "/skip.js" ? skipJs : req.url === "/drone.js" ? droneJs : req.url === "/guest.js" ? guestJs : req.url === "/busk.js" ? buskJs : req.url === "/sleep.js" ? sleepJs : req.url === "/train.js" ? trainJs : req.url === "/store.js" ? storeJs : req.url === "/wx.js" ? wxJs : req.url === "/truck.js" ? truckJs : req.url === "/quiz.js" ? quizJs : req.url === "/night.js" ? nightJs : req.url === "/bench.js" ? benchJs : req.url === "/place.js" ? placeJs : req.url === "/hgi.js" ? hgiJs : req.url === "/streak.js" ? streakJs : req.url === "/calm.js" ? calmJs : req.url === "/bubble.js" ? bubbleJs : req.url === "/capsule.js" ? capsuleJs : req.url === "/ledger.js" ? ledgerJs : req.url === "/subway.js" ? subwayJs : req.url === "/deliv.js" ? delivJs : req.url === "/market.js" ? marketJs : req.url === "/tent.js" ? tentJs : req.url === "/story.js" ? storyJs : req.url === "/mission.js" ? missionJs : req.url === "/game.js" ? gameJs : req.url === "/gift.js" ? giftJs : req.url === "/wc.js" ? wcJs : req.url === "/busk.json" ? JSON.stringify(BUSK) : JSON.stringify(RADIO)); }
   const rm = /^\/(radio-\d{1,2}\.mp3)(?:\?v=\d+)?$/.exec(req.url);
   if (rm && RADIO.some(x => x.f === rm[1])) return sendAudio(req, res, path.join(__dirname, rm[1]));
   const bm = /^\/(busk-\d{1,2}\.mp3)(?:\?v=\d+)?$/.exec(req.url);
@@ -269,7 +269,7 @@ function summary(d) {
   const s = [...d.secs].sort((a, b) => a - b), mid = s.length ? s[s.length >> 1] : 0;
   return { date: d.date, visits: d.visits, people: d.people.size, finished: s.length,
     avgMin: s.length ? +(s.reduce((a, b) => a + b, 0) / s.length / 60).toFixed(1) : 0, medianMin: +(mid / 60).toFixed(1),
-    over5min: s.filter(x => x >= 300).length, peak: d.peak, sources: d.sources, back: d.back || 0, fish: d.fish || 0, v: d.v || {}, fc: d.fc || undefined, sk: d.sk || undefined, dr: d.dr || 0, gs: d.gs || 0, bk: d.bk || 0, bkr: d.bkr || 0, sl: d.sl || undefined, pk: d.pk || undefined, txp: d.txp ? Object.fromEntries(Object.entries(d.txp).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => [k, Math.round(v / 1024)])) : undefined, tx: d.tx0 ? (t => ({ h: +((t.h - d.tx0.h) / 1048576).toFixed(1), w: +((t.w - d.tx0.w) / 1048576).toFixed(1) }))(d.tx1 || txNow()) : undefined, trMax: d.trMax || 0, rm: d.rm || 0, tk: d.tk || 0, qz: d.qz || 0, qzp: d.qzp || 0, px: d.px || 0, hg: d.hg || 0, stk: d.stk || 0, bub: d.bub || 0, cap: d.cap || 0, dv: d.dv || 0, mk: d.mk || 0, tn: d.tn || 0, lg: d.lg || 0, fr: d.fr || 0, tr: d.tr || 0, lvMax: d.lvMax || 0, ft: d.ft || 0, ty: d.ty || 0, tyc: d.tyc || [0, 0, 0, 0, 0, 0, 0, 0], appIn: d.appIn || 0, app: (d.sources && d.sources.app) || 0, rd: d.rd || undefined, ms: d.ms || 0, gm: d.gm || 0, gmb: d.gmb || 0, om: d.om || 0, omb: d.omb || 0, gf: d.gf || 0, gfp: d.gfp || 0 };
+    over5min: s.filter(x => x >= 300).length, peak: d.peak, sources: d.sources, back: d.back || 0, fish: d.fish || 0, v: d.v || {}, fc: d.fc || undefined, sk: d.sk || undefined, dr: d.dr || 0, gs: d.gs || 0, bk: d.bk || 0, bkr: d.bkr || 0, sl: d.sl || undefined, pk: d.pk || undefined, txp: d.txp ? Object.fromEntries(Object.entries(d.txp).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => [k, Math.round(v / 1024)])) : undefined, tx: d.tx0 ? (t => ({ h: +((t.h - d.tx0.h) / 1048576).toFixed(1), w: +((t.w - d.tx0.w) / 1048576).toFixed(1) }))(d.tx1 || txNow()) : undefined, trMax: d.trMax || 0, rm: d.rm || 0, tk: d.tk || 0, qz: d.qz || 0, qzp: d.qzp || 0, px: d.px || 0, hg: d.hg || 0, stk: d.stk || 0, bub: d.bub || 0, cap: d.cap || 0, dv: d.dv || 0, mk: d.mk || 0, tn: d.tn || 0, lg: d.lg || 0, fr: d.fr || 0, tr: d.tr || 0, lvMax: d.lvMax || 0, ft: d.ft || 0, ty: d.ty || 0, tyc: d.tyc || [0, 0, 0, 0, 0, 0, 0, 0], appIn: d.appIn || 0, app: (d.sources && d.sources.app) || 0, rd: d.rd || undefined, ms: d.ms || 0, gm: d.gm || 0, gmb: d.gmb || 0, om: d.om || 0, omb: d.omb || 0, gf: d.gf || 0, gfp: d.gfp || 0, wc: d.wc || 0, wcp: d.wcp || 0, wcb: d.wcb || 0 };
 }
 function rollDay() { if (day.date !== kstDate()) { fbCount.clear(); const sm = summary(day); console.log("[stats] " + JSON.stringify(sm)); history.unshift(sm); history = history.slice(0, 7); day.tx1 = txNow(); prevDay = day; day = newDay(); } }
 setInterval(() => { rollDay(); console.log("[stats-now] " + JSON.stringify(summary(day))); }, 3600e3);   // 한 시간마다 지금까지 숫자를 로그에 남겨 둔다
@@ -404,6 +404,7 @@ for (const [u, f, ct] of [["/tarot.js", "tarot.js"], ["/level.js", "level.js"], 
 const storyJs = fs.readFileSync(path.join(__dirname, "story.js"), "utf8");
 const missionJs = fs.readFileSync(path.join(__dirname, "mission.js"), "utf8");
 const gameJs = fs.readFileSync(path.join(__dirname, "game.js"), "utf8");
+const wcJs = fs.readFileSync(path.join(__dirname, "wc.js"), "utf8");   // 🔤 끝말잇기(누를 때만 받음)
 const giftJs = fs.readFileSync(path.join(__dirname, "gift.js"), "utf8");   // 🎁 머문 시간 선물(01·02 공통)   // ✊ 둘이 하는 놀이(01·02 공통)   // ✅ 오늘 밤 할 일(01·02 공통)   // 📖 한강, 열두 밤(01·02 공통, 누를 때만 받음)
 const benchJs = fs.readFileSync(path.join(__dirname, "bench.js"), "utf8");   // 💛 고마운 벤치(01·02 공통)
 const nightJs = fs.readFileSync(path.join(__dirname, "night.js"), "utf8");   // 🌙 오늘 밤 카드(01·02 공통)
@@ -581,6 +582,15 @@ function gmRound(g, room) {
   for (const id of [g.a, g.b]) { const x = room.users.get(id); if (x) send(x.ws, msg); }
   if (g.sc[g.a] >= 2 || g.sc[g.b] >= 2 || g.n >= 9) { g.fin = 1; setTimeout(() => gmEnd(g, room, {}), 1600); }
 }
+// 🔤 끝말잇기(wc.js): 방마다 한 줄(메모리, 최근 30개만 내려 줌). 두음법칙 허용
+function wcAlts(c) {
+  const k = c.charCodeAt(0) - 0xac00; if (k < 0 || k > 11171) return [c];
+  const ini = k / 588 | 0, med = (k % 588) / 28 | 0, fin = k % 28, mk = i => String.fromCharCode(0xac00 + i * 588 + med * 28 + fin), Y = [2, 6, 12, 17, 20, 7];
+  if (ini === 5) return [c, Y.includes(med) ? mk(11) : mk(2)];
+  if (ini === 2 && Y.includes(med)) return [c, mk(11)];
+  return [c];
+}
+const wcOf = room => { const now = Date.now(); if (!room.wc || now - room.wc.at > 30 * 60e3) room.wc = { ch: [], used: new Set(), n: 0, at: now, reset: 0 }; return room.wc; };
 function omFive(bd, i, c) {   // ⚫ 오목: i에 둔 돌로 다섯 개(이상)가 이어졌는지
   const X = i % 13, Y = i / 13 | 0;
   return [[1, 0], [0, 1], [1, 1], [1, -1]].some(([dx, dy]) => { let n = 1; for (const s of [1, -1]) { let x = X + dx * s, y = Y + dy * s; while (x >= 0 && x < 13 && y >= 0 && y < 13 && bd[y * 13 + x] === c) { n++; x += dx * s; y += dy * s; } } return n >= 5; });
@@ -922,6 +932,25 @@ wss.on("connection", (ws, req) => {
       u.gmBotOm = 1; day.omb = (day.omb || 0) + 1;
     } else if (m.t === "gf" && Number.isInteger(m.n) && m.n >= 1 && m.n <= 60) {   // 🎁 머문 시간 엽서(gift.js) 받음: 접속당 20번까지 센다
       u.gf = (u.gf || 0) + 1; if (u.gf <= 20) { day.gf = (day.gf || 0) + 1; if (u.gf === 1) day.gfp = (day.gfp || 0) + 1; }
+    } else if (m.t === "wcQ") {   // 🔤 끝말잇기 지금 줄
+      const w = wcOf(room); send(ws, { t: "wcS", ch: w.ch.slice(-30), n: w.n });
+    } else if (m.t === "wc" && typeof m.w === "string") {
+      const w = wcOf(room), now = Date.now(), word = m.w.normalize("NFC").trim();
+      if (!u.admin && now - (u.lastWc || 0) < 4000) return send(ws, { t: "wcBad", why: "wait" });
+      if (!/^[가-힣]{2,6}$/.test(word)) return send(ws, { t: "wcBad", why: "form" });
+      if (badText(word)) return send(ws, { t: "wcBad", why: "bad" });
+      if (w.used.has(word)) return send(ws, { t: "wcBad", why: "dup" });
+      const last = w.ch.length ? w.ch[w.ch.length - 1].w : ""; if (last && !wcAlts(last.slice(-1)).includes(word[0])) return send(ws, { t: "wcBad", why: "first" });
+      u.lastWc = now; w.used.add(word); w.n++; w.at = now; w.ch.push({ nick: u.nick, w: word }); if (w.ch.length > 60) w.ch.splice(0, 30);
+      if (w.used.size > 500) w.used = new Set(w.ch.map(x => x.w));
+      day.wc = (day.wc || 0) + 1; if (!u.wcd) { u.wcd = 1; day.wcp = (day.wcp || 0) + 1; }
+      for (const x of room.users.values()) send(x.ws, { t: "wcW", nick: u.nick, w: word, n: w.n, mine: x === u ? 1 : undefined });
+    } else if (m.t === "wcNew") {
+      const w = wcOf(room), now = Date.now(); if (now - w.reset < 30000 || now - (u.lastWcNew || 0) < 30000) return send(ws, { t: "wcBad", why: "busy" });
+      u.lastWcNew = now; room.wc = { ch: [], used: new Set(), n: 0, at: now, reset: now };
+      broadcast(room, { t: "wcS", ch: [], n: 0, reset: 1, by: u.nick });
+    } else if (m.t === "wcBot" && !u.wcBot) {   // 🐶 한강이랑 끝말잇기(폰 안, 통계용 접속당 1번)
+      u.wcBot = 1; day.wcb = (day.wcb || 0) + 1;
     } else if (m.t === "gmQuit" && u.gm) {
       gmEnd(u.gm, room, { quit: u.id });
     } else if (m.t === "gmBot" && !u.gmBot) {   // 🐶 한강이랑 한 판(폰 안에서만, 통계용 접속당 1번)
