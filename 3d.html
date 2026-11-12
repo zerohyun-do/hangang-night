@@ -571,7 +571,7 @@ function tap(px, py) {
 const MAXQ = 40, mPos = new Float32Array(MAXQ * 4 * 3), mCol = new Float32Array(MAXQ * 4 * 4), mIdx = [];
 for (let i = 0; i < MAXQ; i++) { const o = i * 4; mIdx.push(o, o + 1, o + 2, o + 2, o + 1, o + 3); }
 const mGeo = new THREE.BufferGeometry(); mGeo.setAttribute("position", new THREE.BufferAttribute(mPos, 3)); mGeo.setAttribute("col", new THREE.BufferAttribute(mCol, 4)); mGeo.setIndex(mIdx);
-const mMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
+const mMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, fog: false,
   vertexShader: "attribute vec4 col; varying vec4 vc; void main(){ vc = col; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }",
   fragmentShader: "varying vec4 vc; void main(){ gl_FragColor = vec4(vc.rgb * vc.a, vc.a); }" });
 const mMesh = new THREE.Mesh(mGeo, mMat); mMesh.frustumCulled = false; scene.add(mMesh);
@@ -593,6 +593,25 @@ function spawnMeteor(kind, az0, el0) {
   else if (kind === "slow") add({ speed: .16, life: 4.5, tail: .12, w: 2.4, col: C.slow, head: 1.2 });
   else for (let i = 0; i < 5; i++) { const a = Math.random() * TAU; meteors.push({ az, el, daz: Math.cos(a), del: Math.sin(a) * .7 - .2, k: -i * .12, speed: .35, life: .9, tail: .08, w: 1.4, col: C.shower }); }
 }
+// 🌠 사자자리 유성우 밤(98차, 01과 같은 시각): 11/17 밤~11/18 새벽엔 75초마다 30초씩, 앞쪽 오른편 하늘 ♌ 사자자리에서 사방으로. ?leo=1 미리 보기
+const LEO_A = Date.parse("2026-11-17T18:00:00+09:00"), LEO_B = Date.parse("2026-11-18T06:00:00+09:00"), LEO_AZ = .1, LEO_EL = .21;
+const leoOn = () => /[?&]leo=1(?:&|$)/.test(location.search) || (Date.now() >= LEO_A && Date.now() < LEO_B);
+let leoLbl = null, leoShown = -1;
+function spawnLeonid() {
+  const a = Math.random() * TAU, d = .03 + Math.random() * .35, el = LEO_EL + Math.sin(a) * d * .8, az = LEO_AZ + Math.cos(a) * d / Math.cos(LEO_EL);
+  if (el < .07) return;   // 지평선 아래(건물·강 앞)에서는 시작하지 않는다
+  meteors.push({ az, el, daz: Math.cos(a), del: Math.sin(a) * .8, k: 0, speed: .6, life: .55 + Math.random() * .35, tail: .18, w: 5, col: [.9, .97, 1], head: 2 });
+}
+function leoTick(dt) {   // 매 프레임: 사자자리 이름표 + 유성우
+  const on = leoOn();
+  if (on && !leoLbl) { leoLbl = labelSprite("♌ 사자자리", false); leoLbl.material.opacity = .7; leoLbl.scale.set(.9 * 170, .225 * 170, 1); scene.add(leoLbl); }
+  if (leoLbl) { leoLbl.visible = on; if (on) leoLbl.position.copy(dirAt(LEO_AZ + .02, LEO_EL - .06).multiplyScalar(1100).add(camera.position)); }
+  if (!on) return false;
+  const sh = (Date.now() / 1000 + 37) % 75, shower = sh < 30, id = Math.floor((Date.now() / 1000 + 37) / 75);
+  if (shower && id !== leoShown) { leoShown = id; if (sh < 3) toast("🌠 사자자리 유성우가 쏟아져요. 앞쪽 오른편 하늘의 ♌ 사자자리를 봐요", 4000); }
+  if (meteors.length < 30 && Math.random() < dt * (shower ? 4 : .25)) spawnLeonid();
+  return true;
+}
 const camYaw = () => { const d = new THREE.Vector3(); camera.getWorldDirection(d); return Math.atan2(d.x, -d.z); };
 function drawMeteors(dt) {
   const camPos = camera.position, R = 1200; let q = 0, hi = 0;
@@ -609,7 +628,8 @@ function drawMeteors(dt) {
   }
   for (; hi < heads.length; hi++) heads[hi].visible = false;
   mGeo.setDrawRange(0, q * 6); mGeo.attributes.position.needsUpdate = true; mGeo.attributes.col.needsUpdate = true;
-  nextMeteor -= dt * (view.lieK > .5 ? 2 : 1); if (nextMeteor < 0) { nextMeteor = 2.5 + Math.random() * 4; spawnMeteor(); }
+  const leo = leoTick(dt);
+  nextMeteor -= dt * (view.lieK > .5 ? 2 : 1) * (leo ? .5 : 1); if (nextMeteor < 0) { nextMeteor = 2.5 + Math.random() * 4; spawnMeteor(); }
 }
 
 // ---------- 🍽 먹기 · 🥂 짠 ----------

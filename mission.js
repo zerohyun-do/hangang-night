@@ -79,6 +79,11 @@
     setTimeout(() => { pick(); render(); }, 1500);   // ☰ 메뉴가 다 만들어진 뒤에 고른다(그 화면에 있는 기능만)
     setTimeout(() => { pick(); render(); if (S.told || S.fin) return; S.told = true; save(); if (document.querySelector("#msBox.on")) return; open(); }, o.delay || 20000);
     setInterval(() => { if (S.date !== kst()) { pick(); render(); } }, 60000);
+    // 🌠 사자자리 유성우 밤 알림(11/12~17 예고, 11/17 18시~11/18 6시 당일). 하루 한 번
+    setTimeout(() => { const n = Date.now(), A = Date.parse("2026-11-17T18:00:00+09:00"), B = Date.parse("2026-11-18T06:00:00+09:00"), k = "leo-" + kst() + (n >= A ? "on" : "");
+      let seen = ""; try { seen = localStorage.getItem("hn-leo") || ""; } catch {} if (seen === k) return;
+      const msg = n >= A && n < B ? "🌠 오늘 밤은 사자자리 유성우! 75초마다 별똥별이 쏟아져요. 실제 하늘에서도 1년 중 가장 많은 밤이에요" : n < A && n > A - 6 * 864e5 ? "🌠 11/17(화) 밤, 한강 하늘에 사자자리 유성우가 쏟아져요. 그날 밤 같이 봐요" : "";
+      if (!msg) return; try { localStorage.setItem("hn-leo", k); } catch {} opt.toast && opt.toast(msg, 5500); }, 40000);
   };
   H.open = open; H.close = close;
 })();
