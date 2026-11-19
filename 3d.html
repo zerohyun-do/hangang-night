@@ -85,6 +85,7 @@
   #perf { position: fixed; right: 8px; bottom: 80px; font: 11px monospace; color: #9fe; display: none; }
 </style>
 <script src="/radio.js"></script>
+<script src="/first.js"></script>
 <script src="/menu.js"></script>
 <script src="/trip.js"></script>
 <script src="/park.js"></script>
@@ -679,6 +680,7 @@ const FW_HUES = [[1, .84, .47], [1, .43, .43], [1, .55, .82], [.75, .55, 1], [.4
 const rockets = [], bursts = [];
 function launchFw(m) {
   const c = chars.get(m.id); if (!c) return;
+  if (m.id === me && window.HNFirst) HNFirst.step("fw");   // 🧭 처음 1분 ②
   const from = c.root.position.clone().add(new THREE.Vector3(0, 1.2, 0)), to = new THREE.Vector3(from.x * .6 + (m.x != null ? (m.x - .5) * 60 : 0), 14 + m.p * 16, -22 - m.p * 18);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color: 0xffe2b0, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true })); s.scale.set(1.2, 1.2, 1); scene.add(s);
   rockets.push({ s, from, to, k: 0, m }); c.cheerAt = 0; c.fwAt = performance.now();
@@ -761,7 +763,7 @@ function fishing() { const c = chars.get(me); return !!c && c.state === "sit" &&
 function fishTick() {
   const now = performance.now(), on = fishing() && ws && ws.readyState === 1;
   if (!on) { if (fish.phase) { fish.phase = ""; $("biteBtn").classList.remove("on"); } return; }
-  if (!fish.phase) { fish.phase = "wait"; fish.until = now + 6000 + Math.random() * 16000; }
+  if (!fish.phase) { fish.phase = "wait"; fish.until = now + (window.HNFirst && HNFirst.fast() ? 2500 + Math.random() * 2500 : 6000 + Math.random() * 16000); }
   else if (fish.phase === "wait" && now > fish.until && !$("catchBox").classList.contains("on")) {
     fish.phase = "bite"; fish.until = now + 2200; $("biteBtn").classList.add("on"); try { navigator.vibrate && navigator.vibrate(90); } catch {}
   } else if (fish.phase === "bite" && now > fish.until) {
@@ -794,6 +796,7 @@ function onFishTop(m) {
 }
 function onCatch(m) {
   const c = chars.get(m.id), f = FISH[m.f]; if (!c || !f) return;
+  if (m.id === me && window.HNFirst) HNFirst.step("fish");   // 🧭 처음 1분 ①
   if (c.caught) { c.root.remove(c.caught.s); c.caught.s.material.map.dispose(); }
   const [cv, g] = cvs(320, 200); g.textAlign = "center"; g.textBaseline = "middle";
   try { g.filter = f[5] || "none"; } catch {} g.font = "96px sans-serif"; g.fillText(f[1], 160, 70); g.filter = "none";
@@ -876,7 +879,7 @@ let visit = { days: [], secs: 0 }; try { visit = Object.assign(visit, JSON.parse
 const RETURNING = visit.days.some(d => d !== kstDay());
 const WITH = (/[?&]with=(\d{1,2})(?:&|$)/.exec(location.search) || [])[1] || ""; let BY = ""; try { BY = decodeURIComponent((/[?&]by=([^&]{1,120})/.exec(location.search) || [])[1] || ""); } catch {} let withSaid = false, myRoom = 1, cntInfo = null;
 function inviteFriend() {
-  const url = location.origin + "/3d?with=" + myRoom + "&by=" + encodeURIComponent(myNick || "") + "&from=invite", text = "밤 한강 돗자리 3D에서 같이 앉아 있자 🌙";
+  const url = location.origin + "/3d?with=" + myRoom + "&by=" + encodeURIComponent(myNick || "") + "&from=invite", text = "🌙 나 지금 밤 한강 돗자리(3D)에 앉아 있어. 링크 누르면 바로 내 옆자리야";
   if (navigator.share) { navigator.share({ title: "밤 한강 돗자리", text, url }).catch(() => {}); return; }
   (navigator.clipboard ? navigator.clipboard.writeText(text + " " + url) : Promise.reject()).then(() => toast("👫 링크를 복사했어요. 친구가 열면 같은 방으로 와요", 3200), () => prompt("이 링크를 친구에게 보내 주세요", url));
 }
@@ -885,6 +888,18 @@ const friendNicks = new Set();
 document.getElementById("invBtn").onclick = () => inviteFriend();
 setTimeout(() => { try { if (localStorage.getItem("hn-invHint")) return; localStorage.setItem("hn-invHint", "1"); } catch { return; } if (!WITH) toast("👫 위쪽 버튼으로 친구를 내 옆자리에 부를 수 있어요", 4000); }, 45000);
 function friendLabel(id) { const c = chars.get(id); if (!c || !c.lbl) return; const pos = c.lbl.position.clone(), sc = c.lbl.scale.clone(), vis = c.lbl.visible; c.root.remove(c.lbl); c.lbl = labelSprite("👫 " + (c.r ? "🎧 " : "") + (c.sl ? "💤 " : "") + (c.sk && window.HNStreak ? HNStreak.badge(c.sk) + " " : "") + (c.fc != null && window.HNFocus ? HNFocus.kind(c.fc) + " " : "") + c.nick, false); c.lbl.position.copy(pos); c.lbl.scale.copy(sc); c.lbl.visible = vis; c.root.add(c.lbl); }
+// 🧭 101차 바로 앉기: 다른 사람이 앉은 곳 옆 빈자리 → 없으면 돗자리들 가운데
+function autoSit() {
+  const my = chars.get(me); if (!my || my.seat != null || !(ws && ws.readyState === 1) || !seats.length) return;
+  const others = [...chars.values()].filter(c => c.id !== me && c.seat != null && c.state !== "leave");
+  const cx0 = seats.reduce((a, p) => a + p.x, 0) / seats.length, cz0 = seats.reduce((a, p) => a + p.z, 0) / seats.length;
+  let k = -1, bd = 1e9;
+  seats.forEach((p, j) => { if (seatTaken(j)) return; let d;
+    if (others.length) { d = 1e9; for (const o of others) d = Math.min(d, Math.hypot(p.x - seats[o.seat].x, p.z - seats[o.seat].z)); } else d = Math.hypot(p.x - cx0, p.z - cz0);
+    if (d < bd) { bd = d; k = j; } });
+  if (k < 0) return;
+  ws.send(JSON.stringify({ t: "sit", seat: k }));   // 도착하면 "다른 빈 돗자리를 누르면 옮길 수 있어요" 안내가 뜬다
+}
 function friendSit(id) {
   const f = chars.get(id), my = chars.get(me); if (!f || !my) return;
   if (f.seat == null) { toast(`👫 ${f.nick}님은 지금 걷는 중이에요. 친구가 앉으면 옆에 앉아 보세요`, 3500); return; }
@@ -1186,12 +1201,12 @@ function connect() {
       $("cnt").textContent = m.users.length; buildEmo(m.emojis || EMOJIS_DEFAULT); buildBar();
       if (myDir === "front") ws.send(JSON.stringify({ t: "dir", d: "front" }));
       $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-      setTimeout(() => toast("빛나는 돗자리를 눌러 앉아 보세요", 3500), 1500);
+      if (!WITH) setTimeout(autoSit, 1300); else setTimeout(() => toast("빛나는 돗자리를 눌러 앉아 보세요", 3500), 1500);   // 🧭 101차: 들어오면 바로 앉힌다
     }
     else if (m.t === "join") addChar(m.user, true);
     else if (m.t === "friendIn" || m.t === "friendOf") onFriend(m);
     else if (m.t === "leave") removeChar(m.id);
-    else if (m.t === "seat") { goSeat(m.id, m.seat); if (m.id === me) { view.follow = false; const c = chars.get(me); if (c) { c.act = "sit"; syncBar(); } } }
+    else if (m.t === "seat") { goSeat(m.id, m.seat); if (m.id === me) { view.follow = false; if (window.HNFirst) HNFirst.step("seated"); const c = chars.get(me); if (c) { c.act = "sit"; syncBar(); } } }
     else if (m.t === "go") { if (!(m.id === me && joyEcho(m.x, m.y))) goTo(m.id, m.x, m.y); }
     else if (m.t === "taken") toast("앗, 방금 다른 분이 먼저 앉았어요", 2200);
     else if (m.t === "emo") { const c = chars.get(m.id); if (c && c.emo.length < 3) showEmo(c, m.e); }
@@ -1327,7 +1342,9 @@ if (!storyHint.done) { storyHint.done = 1; setTimeout(storyHint, 9000); }   // �
 if (window.HNGame && !HNGame.inited) { HNGame.inited = true; HNGame.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), me: () => me, nick: id => (chars.get(id) || {}).nick, talkTarget: () => talkTarget, closeTalk: () => $("talkBox").classList.remove("on"), toast, closeOthers: () => { if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // ✊ 둘이 하는 놀이(game.js)
 window.openWord = function openWord() { if (window.HNWord && HNWord.open) return HNWord.open(); if (openWord.busy) return; openWord.busy = 1; const s = document.createElement("script"); s.src = "/wc.js"; s.onload = () => { HNWord.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), myNick: () => (chars.get(me) || {}).nick, closeOthers: () => { if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); HNWord.open(); }; s.onerror = () => { openWord.busy = 0; toast("끝말잇기를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요", 2400); }; document.head.appendChild(s); }   // 🔤 끝말잇기(wc.js, 누를 때만 받음)
 if (window.HNGift && !HNGift.inited) { HNGift.inited = true; HNGift.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), toast, chipTop: 138, online: () => ws && ws.readyState === 1, hidden: () => document.body.classList.contains("slOn") || document.body.classList.contains("bkOn") || (window.HNTrip && HNTrip.isOpen), closeOthers: () => { if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // 🎁 머문 시간 선물(gift.js)
-if (window.HNMission && !HNMission.inited) { HNMission.inited = true; HNMission.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), toast, closeOthers: () => { if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // ✅ 오늘 밤 할 일(mission.js)
+if (window.HNFirst && !HNFirst.inited) { HNFirst.inited = true; HNFirst.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), nick: () => (chars.get(me) || {}).nick || myNick, dexN: FISH.length, invite: inviteFriend,
+  fish: () => { const c = chars.get(me); if (c && c.act !== "fish") doFish(); }, fw: () => { const c = chars.get(me); if (c && c.act === "fish") doFish(); fireFw(); return false; } }); }   // 🧭 처음 1분(first.js, 01·02 공통)
+if (window.HNMission && !HNMission.inited) { HNMission.inited = true; HNMission.init({ delay: window.HNFirst && HNFirst.isNew() ? 600000 : undefined, send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), toast, closeOthers: () => { if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // ✅ 오늘 밤 할 일(mission.js)
 if (window.HNTarot && !HNTarot.inited) { HNTarot.inited = true; HNTarot.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), me: () => me, isAdmin: () => isAdmin3, openSup, closeOthers: () => { if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }
 if (window.HNApp && !HNApp.inited) { HNApp.inited = true; HNApp.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), me: () => me, isAdmin: () => isAdmin3, openSup, closeOthers: () => { if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // 📱🍀🧪 93차(app.js, 01·02 공통)   // 🔮 타로 할머니(tarot.js, 01·02 공통)
 if (window.HNLevel && !HNLevel.inited) { HNLevel.inited = true; HNLevel.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), me: () => me, chars: () => chars, visit: () => visit, online: () => ws && ws.readyState === 1, toast, closeOthers: () => { if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // 🏅 한강 등급(level.js, 01·02 공통)

@@ -119,6 +119,13 @@
   #nickRow input:focus, #nickBox input:focus { border-color: rgba(243,217,164,.6); }
   #nickRow button, #nickBox button, #talkBox, #wishBox button, #sayBox button, #fbBox button { all: unset; cursor: pointer; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 16px; display: grid; place-items: center; min-height: 40px; }
   #gate small.nickHint { margin: 8px 0 22px; }
+  /* 🧭 101차 입장 화면 단순하게: 지금 인원·연속 출석 한 줄, 채널 카드 낮게, 큰 버튼 하나 */
+  #gate p { margin-bottom: 12px; } #gate small.nickHint { margin: 6px 0 14px; }
+  #gateLive { display: inline-flex; gap: 6px; align-items: center; margin: 0 auto 16px; padding: 7px 14px; border-radius: 999px; background: rgba(120,230,160,.1); border: 1px solid rgba(120,230,160,.3); color: #d9f5e2; font-size: 13.5px; font-weight: 600; min-height: 18px; }
+  #gateLive:empty { visibility: hidden; } #gateLive i { width: 8px; height: 8px; border-radius: 50%; background: #6fe39a; box-shadow: 0 0 8px #6fe39a; animation: hnLive 1.6s ease-in-out infinite; } @keyframes hnLive { 50% { opacity: .35; } }
+  #gateStreak { display: block; margin: 0 0 10px; color: #ffd99a; font-size: 13.5px; font-weight: 700; } #gateStreak:empty { display: none; }
+  #gate #chRow button { padding: 10px 8px 9px; gap: 2px; } #chRow i { font-size: 22px; line-height: 28px; } #chRow i.b3d { font-size: 15px; line-height: 28px; }
+  #gate #go { display: block; width: min(340px, 100%); box-sizing: border-box; margin: 0 auto; padding: 16px 20px; font-size: 17px; background: linear-gradient(90deg, #ffd99a, #ffb3a0); box-shadow: 0 6px 22px rgba(255,190,140,.3); }
   #talkBox, #wishBox small, #sayBox small, #fbBox small { color: var(--dim); font-size: 12px; }
   #inbox { position: fixed; inset: auto 16px 16px 16px; top: calc(max(12px, env(safe-area-inset-top)) + 56px); max-width: 520px; margin: 0 auto; background: rgba(14,20,40,.92); border: 1px solid var(--line); border-radius: 18px; padding: 14px; display: none; flex-direction: column; gap: 8px; z-index: 5; }
   #inbox.on { display: flex; }
@@ -217,18 +224,21 @@
 <div id="nickBox" class="pill"><b>닉네임 바꾸기</b><div><input id="nickEd" maxlength="5" autocomplete="off" enterkeyhint="done" aria-label="새 닉네임"><button id="nickEdDice" aria-label="다른 이름">🎲</button></div><div class="btns"><button id="nickCancel">닫기</button><button id="nickSave" class="on">바꾸기</button></div></div>
 <div id="gate"><div class="box">
   <h1>밤 한강 돗자리</h1>
-  <p id="gateMsg">조용한 강변에 잠깐 앉았다 가요.<br>여기 앉은 사람들은 모두 지금 접속한 사람이에요.</p>
+  <p id="gateMsg">조용한 강변에 잠깐 앉았다 가요.<br>여기 사람들은 모두 지금 접속한 진짜 사람이에요.</p>
+  <div id="gateLive" aria-live="polite"></div>
   <div id="nickRow"><input id="nickIn" maxlength="5" autocomplete="off" enterkeyhint="go" aria-label="닉네임"><button id="nickDice" aria-label="다른 이름">🎲</button></div>
   <div id="gRow" role="radiogroup" aria-label="캐릭터"><button data-g="m">👦 남자</button><button data-g="f">👧 여자</button><button data-g="">🙂 선택 안 함</button></div>
-  <small class="nickHint">닉네임(5자까지)은 그대로 둬도 돼요. 폭죽을 쏘면 하늘에 이름이 떠요.</small>
+  <small class="nickHint">이름은 그대로 둬도 돼요 · 폭죽을 쏘면 하늘에 이 이름이 떠요</small>
   <div id="chRow" role="radiogroup" aria-label="채널 고르기"><b>채널 고르기</b>
     <button data-ch="01" class="on"><i>🌙</i><strong>여의도 01</strong><span>일반 · 그림 같은 2D</span></button>
     <button data-ch="02"><i class="b3d">3D</i><strong>여의도 02</strong><span>360도로 둘러보는 3D</span></button></div>
-  <button id="go">여의도 01 입장</button>
+  <b id="gateStreak"></b>
+  <button id="go">🧺 돗자리에 앉으러 가기</button>
   <small id="soundNote">친구를 누르면 짧은 말을 걸 수 있어요.</small>
 </div></div>
 
 <script src="/radio.js"></script>
+<script src="/first.js"></script>
 <script src="/menu.js"></script>
 <script src="/trip.js"></script>
 <script src="/park.js"></script>
@@ -1349,6 +1359,7 @@ const fwApex = p => H * (Y.S * (.82 - .62 * p));   // 약하게 당기면 빌딩
 
 function launchFw(m) {
   const c = chars.get(m.id); if (!c) return;
+  if (m.id === me && window.HNFirst) HNFirst.step("fw");   // 🧭 처음 1분 ②
   c.fwAt = performance.now();
   const r = rng(m.s), o = fwFrom(c), ty = Math.max(fwApex(m.p), fwR(m.p) * 1.05 + 58);   // 가로 화면에서 위로 잘리지 않게
   const tx = typeof m.x === "number" ? m.x * W + (r() - .5) * W * .03 : o.x + (W / 2 - o.x) * .3 + (r() - .5) * W * .25;   // 조준한 방향(화면 가로 비율)
@@ -2092,7 +2103,7 @@ function fishing() { const c = chars.get(me); return !!c && c.state === "sit" &&
 function fishTick() {
   const now = performance.now(), on = fishing() && ws && ws.readyState === 1;
   if (!on) { if (fish.phase) { fish.phase = ""; $("biteBtn").classList.remove("on"); } return; }
-  if (!fish.phase) { fish.phase = "wait"; fish.until = now + 6000 + Math.random() * 16000; }
+  if (!fish.phase) { fish.phase = "wait"; fish.until = now + (window.HNFirst && HNFirst.fast() ? 2500 + Math.random() * 2500 : 6000 + Math.random() * 16000); }
   else if (fish.phase === "wait" && now > fish.until && !$("catchBox").classList.contains("on")) {
     fish.phase = "bite"; fish.until = now + 2200; $("biteBtn").classList.add("on"); try { navigator.vibrate && navigator.vibrate(90); } catch {}
   } else if (fish.phase === "bite" && now > fish.until) {
@@ -2125,6 +2136,7 @@ function onFishTop(m) {
 }
 function onCatch(m) {
   const c = chars.get(m.id), f = FISH[m.f]; if (!c || !f) return;
+  if (m.id === me && window.HNFirst) HNFirst.step("fish");   // 🧭 처음 1분 ①
   c.caught = { i: m.f, cm: m.cm, at: performance.now() };
   if (m.id !== me && f[2] >= 2) toast(`${f[2] === 3 ? "✨" : "🎣"} ${c.nick || "누군가"}님이 ${f[0]}${m.cm ? ` ${m.cm}cm을` : eul(f[0])} 낚았어요!`, 3500);
 }
@@ -2200,7 +2212,7 @@ const RETURNING = visit.days.some(d => d !== kstDay());
 // 👥 지금 접속·오늘 다녀간 사람 / 👫 친구 부르기(같은 방 링크)
 const WITH = (/[?&]with=(\d{1,2})(?:&|$)/.exec(location.search) || [])[1] || ""; let BY = ""; try { BY = decodeURIComponent((/[?&]by=([^&]{1,120})/.exec(location.search) || [])[1] || ""); } catch {} let withSaid = false, myRoom = 1, cntInfo = null;
 function inviteFriend() {
-  const url = location.origin + "/?with=" + myRoom + "&by=" + encodeURIComponent(myNick || "") + "&from=invite", text = "밤 한강 돗자리에서 같이 앉아 있자 🌙";
+  const url = location.origin + "/?with=" + myRoom + "&by=" + encodeURIComponent(myNick || "") + "&from=invite", text = "🌙 나 지금 밤 한강 돗자리에 앉아 있어. 링크 누르면 바로 내 옆자리야";
   if (navigator.share) { navigator.share({ title: "밤 한강 돗자리", text, url }).catch(() => {}); return; }
   (navigator.clipboard ? navigator.clipboard.writeText(text + " " + url) : Promise.reject()).then(() => toast("👫 링크를 복사했어요. 친구가 열면 같은 방으로 와요", 3200), () => prompt("이 링크를 친구에게 보내 주세요", url));
 }
@@ -2208,6 +2220,17 @@ function inviteFriend() {
 const friendNicks = new Set();
 $("invBtn").onclick = () => inviteFriend();
 setTimeout(() => { try { if (localStorage.getItem("hn-invHint")) return; localStorage.setItem("hn-invHint", "1"); } catch { return; } if (!WITH) toast("👫 위쪽 버튼으로 친구를 내 옆자리에 부를 수 있어요", 4000); }, 45000);
+// 🧭 101차 바로 앉기: 다른 사람이 앉은 돗자리 옆 빈자리 → 없으면 가운데에 가까운 빈자리
+function autoSit() {
+  const my = chars.get(me); if (!my || my.seat != null || lastSeat != null || !(ws && ws.readyState === 1)) return;
+  const others = [...chars.values()].filter(c => c.id !== me && c.seat != null && c.state !== "leave");
+  let k = -1, bd = 1e9;
+  seats.forEach((p, j) => { if (seatTaken(j)) return;
+    const d = others.length ? Math.min(...others.map(o => Math.hypot(p.x - seats[o.seat].x, (p.y - seats[o.seat].y) * 2))) : Math.hypot(p.x - W / 2, (p.y - H * .72) * 2);
+    if (d < bd) { bd = d; k = j; } });
+  if (k < 0) return;
+  ws.send(JSON.stringify({ t: "sit", seat: k }));   // 도착하면 "다른 빈 돗자리를 누르면 옮길 수 있어요" 안내가 뜬다
+}
 function friendSit(id) {
   const f = chars.get(id), my = chars.get(me); if (!f || !my) return;
   if (f.seat == null) { toast(`👫 ${f.nick}님은 지금 걷는 중이에요. 친구가 앉으면 옆에 앉아 보세요`, 3500); return; }
@@ -2393,6 +2416,7 @@ function connect() {
       adminOn = !!m.adminHere;
       if (myDir === "front") ws.send(JSON.stringify({ t: "dir", d: "front" }));
       if (lastSeat != null) { restoring = true; ws.send(JSON.stringify({ t: "sit", seat: lastSeat })); }   // 다시 붙으면 앉아 있던 자리로
+      else if (!WITH) setTimeout(autoSit, 1300);   // 🧭 101차: 들어오면 바로 앉힌다(사람 옆 빈자리 먼저)
       syncActs();
     } else if (m.t === "join") addChar(m.user, true);
     else if (m.t === "friendIn" || m.t === "friendOf") onFriend(m);
@@ -2404,6 +2428,7 @@ function connect() {
         if (lastSeat == null || !restStart) restStart = Date.now();
         if (restoring && lastAct !== "sit") { const c = chars.get(me); if (c) { c.act = lastAct; syncActs(); ws.send(JSON.stringify({ t: "act", a: lastAct })); } }
         const wasRestoring = restoring; lastSeat = m.seat; restoring = false; restTick();
+        if (window.HNFirst) HNFirst.step("seated");
         const mates = groups[seats[m.seat].g].seats.map(k => [...chars.values()].find(c => c.seat === k && c.id !== me && c.state !== "leave")).filter(Boolean);
         if (mates.length && !wasRestoring) { face(me, 2600, "😊"); mates.forEach(c => face(c.id, 2600, "😊")); }
         if (mates.length && !wasRestoring) toast(`🧺 ${mates.map(c => c.nick).join(", ")}님과 같은 돗자리에 앉았어요. 👋 인사해 볼까요?`, 3200);
@@ -2861,7 +2886,10 @@ fetch("amb-river.mp3", { method: "HEAD" }).then(r => {
 
 // 채널: 01(2D, 이 페이지) / 02(3D, /3d 페이지). 두 채널은 사람이 섞이지 않는다
 let myCh = "01";
-$("chRow").querySelectorAll("button").forEach(b => b.onclick = () => { myCh = b.dataset.ch; $("chRow").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); $("go").textContent = myCh === "02" ? "여의도 02 (3D) 입장" : "여의도 01 입장"; });
+$("chRow").querySelectorAll("button").forEach(b => b.onclick = () => { myCh = b.dataset.ch; $("chRow").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); $("go").textContent = myCh === "02" ? "🧺 3D 돗자리에 앉으러 가기" : "🧺 돗자리에 앉으러 가기"; });
+// 🧭 101차 입장 화면: 지금 앉아 있는 사람(서버 /now, 수십 바이트) + 연속 출석
+fetch("/now").then(r => r.json()).then(n => { if (!n || $("gate").classList.contains("off")) return; $("gateLive").innerHTML = n.on > 0 ? `<i></i>지금 ${n.on}명이 앉아 있어요${n.today > n.on ? ` · 오늘 ${n.today}명` : ""}` : n.today ? `<i></i>오늘 ${n.today}명이 다녀갔어요` : ""; }).catch(() => {});
+{ const st = visitStreak(), done = visit.days.includes(kstDay()); let y = 0; for (let d = Date.now() - 864e5; visit.days.includes(kstDay(d)) || (visit.frozen || []).includes(kstDay(d)); d -= 864e5) y++; if (visit.days.length) $("gateStreak").textContent = done ? `📒 오늘 도장 받았어요${st > 1 ? ` · 🔥 ${st}일 연속` : ""}` : y > 0 ? `🔥 어제까지 ${y}일 연속 · 오늘 오면 ${y + 1}일째` : `📒 다시 왔네요! 오늘 도장 받으러 가요`; }
 $("go").onclick = () => {
   const n = $("nickIn").value.replace(/\s+/g, " ").trim(); saveNick(n || myNick);
   if (myCh === "02") { location.href = "/3d" + location.search; return; }
@@ -2882,7 +2910,12 @@ $("go").onclick = () => {
   if (window.HNGame && !HNGame.inited) { HNGame.inited = true; HNGame.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), me: () => me, nick: id => (chars.get(id) || {}).nick, talkTarget: () => talkTarget, closeTalk: () => $("talkBox").classList.remove("on"), toast, closeOthers: () => { closePanels(); if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // ✊ 둘이 하는 놀이(game.js)
   window.openWord = function openWord() { if (window.HNWord && HNWord.open) return HNWord.open(); if (openWord.busy) return; openWord.busy = 1; const s = document.createElement("script"); s.src = "/wc.js"; s.onload = () => { HNWord.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), myNick: () => (chars.get(me) || {}).nick, closeOthers: () => { closePanels(); if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); HNWord.open(); }; s.onerror = () => { openWord.busy = 0; toast("끝말잇기를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요", 2400); }; document.head.appendChild(s); }   // 🔤 끝말잇기(wc.js, 누를 때만 받음)
   if (window.HNGift && !HNGift.inited) { HNGift.inited = true; HNGift.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), toast, online: () => ws && ws.readyState === 1, hidden: () => document.body.classList.contains("slOn") || document.body.classList.contains("bkOn") || (window.HNTrip && HNTrip.isOpen), closeOthers: () => { closePanels(); if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // 🎁 머문 시간 선물(gift.js)
-  if (window.HNMission && !HNMission.inited) { HNMission.inited = true; HNMission.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), toast, closeOthers: () => { closePanels(); if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // ✅ 오늘 밤 할 일(mission.js)
+  if (window.HNFirst && !HNFirst.inited) { HNFirst.inited = true; HNFirst.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), nick: () => (chars.get(me) || {}).nick || myNick, dexN: FISH.length, invite: inviteFriend,
+    fish: () => { const c = chars.get(me); if (c && c.act !== "fish") { if (aiming) setAiming(false); closePanels(); doAct("fish"); } },
+    fw: () => { const c = chars.get(me); if (!c || c.state === "leave" || !ws || ws.readyState !== 1) return false; if (c.act === "fish") doAct("fish"); closePanels(); if (aiming) setAiming(false);   // 처음엔 당기기 없이 바로 한 발
+      ws.send(JSON.stringify({ t: "fw", p: .85, x: aimX(c, 0) / W })); lastFwSent = performance.now(); fwToday++; try { localStorage.setItem(FW_KEY, JSON.stringify({ d: today(), n: fwToday })); } catch {}
+      setTimeout(() => toast("🎆 다음엔 아래 폭죽 버튼 → 화면을 아래로 당겼다 놓으면 원하는 쪽으로 쏴요", 4200), 2600); return false; } }); }   // 🧭 처음 1분(first.js, 01·02 공통)
+  if (window.HNMission && !HNMission.inited) { HNMission.inited = true; HNMission.init({ delay: window.HNFirst && HNFirst.isNew() ? 600000 : undefined, send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), toast, closeOthers: () => { closePanels(); if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // ✅ 오늘 밤 할 일(mission.js)
   if (window.HNTarot && !HNTarot.inited) { HNTarot.inited = true; HNTarot.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), me: () => me, isAdmin: () => isAdmin, openSup, closeOthers: () => { closePanels(); if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }
   if (window.HNApp && !HNApp.inited) { HNApp.inited = true; HNApp.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), me: () => me, isAdmin: () => isAdmin, openSup, closeOthers: () => { closePanels(); if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // 📱🍀🧪 93차(app.js, 01·02 공통)   // 🔮 타로 할머니(tarot.js, 01·02 공통)
   if (window.HNLevel && !HNLevel.inited) { HNLevel.inited = true; HNLevel.init({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), me: () => me, chars: () => chars, visit: () => visit, online: () => ws && ws.readyState === 1, toast, closeOthers: () => { closePanels(); if (window.HNMenu && HNMenu.close) HNMenu.close(); } }); }   // 🏅 한강 등급(level.js, 01·02 공통)
@@ -2907,7 +2940,7 @@ $("go").onclick = () => {
   HNRadio.start({ send: m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m)), toast, openSup, me: () => me, chipTop: 50, bannerTop: 132 });
 };
 
-fetch("/stats").then(r => r.json()).then(s => { if (s.total) $("gateMsg").innerHTML = `지금 <b>${s.total}명</b>이 한강에 나와 있어요.<br>여기 있는 사람들은 모두 지금 접속한 사람이에요.`; }).catch(() => {});
+// (101차) 입장 화면 인원은 /now로(예전 /stats는 기록 전체를 받아서 무거웠음)
 
 addEventListener("resize", layout);
 layout();
