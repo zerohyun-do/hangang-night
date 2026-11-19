@@ -210,6 +210,8 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { "content-type": "application/json" });
     return res.end(JSON.stringify({ total: total(), rooms: rooms.map(r => r.users.size), rooms3d: rooms3d.map(r => r.users.size), today: summary(day), yesterday: prevDay && summary(prevDay), days: history, since: startedAt }, null, 1));
   }
+  if (req.url === "/now") { rollDay(); res.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" }); return res.end(JSON.stringify({ on: total(), today: day.people.size })); }   // 🧭 입장 화면 한 줄(수십 바이트)
+  { const fm = /^\/from=([\w-]{1,20})\/?$/.exec(req.url); if (fm) { res.writeHead(302, { location: "/?from=" + fm[1].toLowerCase() }); return res.end(); } }   // 물음표 빠진 홍보 링크(/from=inSta) → 통계에 잡히게
   if (/^\/3d(\?|$)/.test(req.url)) { res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" }); return res.end(pages().d3); }
   const vm = /^\/vendor\/(three\.(?:module|core)\.js)$/.exec(req.url);
   if (vm && vendor[vm[1]]) {
@@ -269,7 +271,7 @@ function summary(d) {
   const s = [...d.secs].sort((a, b) => a - b), mid = s.length ? s[s.length >> 1] : 0;
   return { date: d.date, visits: d.visits, people: d.people.size, finished: s.length,
     avgMin: s.length ? +(s.reduce((a, b) => a + b, 0) / s.length / 60).toFixed(1) : 0, medianMin: +(mid / 60).toFixed(1),
-    over5min: s.filter(x => x >= 300).length, peak: d.peak, sources: d.sources, back: d.back || 0, fish: d.fish || 0, v: d.v || {}, fc: d.fc || undefined, sk: d.sk || undefined, dr: d.dr || 0, gs: d.gs || 0, bk: d.bk || 0, bkr: d.bkr || 0, sl: d.sl || undefined, pk: d.pk || undefined, txp: d.txp ? Object.fromEntries(Object.entries(d.txp).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => [k, Math.round(v / 1024)])) : undefined, tx: d.tx0 ? (t => ({ h: +((t.h - d.tx0.h) / 1048576).toFixed(1), w: +((t.w - d.tx0.w) / 1048576).toFixed(1) }))(d.tx1 || txNow()) : undefined, trMax: d.trMax || 0, rm: d.rm || 0, tk: d.tk || 0, qz: d.qz || 0, qzp: d.qzp || 0, px: d.px || 0, hg: d.hg || 0, stk: d.stk || 0, bub: d.bub || 0, cap: d.cap || 0, dv: d.dv || 0, mk: d.mk || 0, tn: d.tn || 0, lg: d.lg || 0, fr: d.fr || 0, tr: d.tr || 0, lvMax: d.lvMax || 0, ft: d.ft || 0, ty: d.ty || 0, tyc: d.tyc || [0, 0, 0, 0, 0, 0, 0, 0], appIn: d.appIn || 0, app: (d.sources && d.sources.app) || 0, rd: d.rd || undefined, ms: d.ms || 0, gm: d.gm || 0, gmb: d.gmb || 0 };
+    over5min: s.filter(x => x >= 300).length, peak: d.peak, sources: d.sources, back: d.back || 0, fish: d.fish || 0, v: d.v || {}, fc: d.fc || undefined, sk: d.sk || undefined, dr: d.dr || 0, gs: d.gs || 0, bk: d.bk || 0, bkr: d.bkr || 0, sl: d.sl || undefined, pk: d.pk || undefined, txp: d.txp ? Object.fromEntries(Object.entries(d.txp).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => [k, Math.round(v / 1024)])) : undefined, tx: d.tx0 ? (t => ({ h: +((t.h - d.tx0.h) / 1048576).toFixed(1), w: +((t.w - d.tx0.w) / 1048576).toFixed(1) }))(d.tx1 || txNow()) : undefined, trMax: d.trMax || 0, rm: d.rm || 0, tk: d.tk || 0, qz: d.qz || 0, qzp: d.qzp || 0, px: d.px || 0, hg: d.hg || 0, stk: d.stk || 0, bub: d.bub || 0, cap: d.cap || 0, dv: d.dv || 0, mk: d.mk || 0, tn: d.tn || 0, lg: d.lg || 0, fr: d.fr || 0, tr: d.tr || 0, lvMax: d.lvMax || 0, ft: d.ft || 0, ty: d.ty || 0, tyc: d.tyc || [0, 0, 0, 0, 0, 0, 0, 0], appIn: d.appIn || 0, app: (d.sources && d.sources.app) || 0, rd: d.rd || undefined, ms: d.ms || 0, gm: d.gm || 0, gmb: d.gmb || 0, fs: d.fs || [0, 0, 0, 0, 0] };
 }
 function rollDay() { if (day.date !== kstDate()) { fbCount.clear(); const sm = summary(day); console.log("[stats] " + JSON.stringify(sm)); history.unshift(sm); history = history.slice(0, 7); day.tx1 = txNow(); prevDay = day; day = newDay(); } }
 setInterval(() => { rollDay(); console.log("[stats-now] " + JSON.stringify(summary(day))); }, 3600e3);   // 한 시간마다 지금까지 숫자를 로그에 남겨 둔다
@@ -397,7 +399,7 @@ const plIp = new Map();
 function plDay() { const d = new Date(Date.now() + 4 * 3600e3).toISOString().slice(0, 10); if (pl.date !== d) { if (pl.date && pl.n) console.log("[픽셀] 지난 판 " + pl.n + "칸 · " + pl.who.size + "명"); pl = { cells: "0".repeat(PL_W * PL_H), nicks: new Array(PL_W * PL_H).fill(""), date: d, n: 0, who: new Set() }; } return pl; }
 const plPub = () => { plDay(); return { w: PL_W, h: PL_H, cd: PL_CD, cells: pl.cells, nicks: pl.nicks, n: pl.n }; };
 const STATIC = {};   // 93차 이후 파일들: 시작할 때 읽어 둔다
-for (const [u, f, ct] of [["/tarot.js", "tarot.js"], ["/level.js", "level.js"], ["/app.js", "app.js"], ["/fortune.js", "fortune.js"], ["/type.js", "type.js"], ["/sw.js", "sw.js"],
+for (const [u, f, ct] of [["/tarot.js", "tarot.js"], ["/level.js", "level.js"], ["/app.js", "app.js"], ["/fortune.js", "fortune.js"], ["/type.js", "type.js"], ["/sw.js", "sw.js"], ["/first.js", "first.js"],
   ["/manifest.webmanifest", "manifest.webmanifest", "application/manifest+json"], ["/app/icon-180.png", "app/icon-180.png", "image/png"], ["/app/icon-192.png", "app/icon-192.png", "image/png"], ["/app/icon-512.png", "app/icon-512.png", "image/png"]]) {
   try { const bin = /png$/.test(f); STATIC[u] = { body: fs.readFileSync(path.join(__dirname, f), bin ? undefined : "utf8"), ct: ct || "text/javascript; charset=utf-8", bin }; } catch (e) { console.log("[static 없음]", f); }
 }
@@ -911,6 +913,9 @@ wss.on("connection", (ws, req) => {
       gmEnd(u.gm, room, { quit: u.id });
     } else if (m.t === "gmBot" && !u.gmBot) {   // 🐶 한강이랑 한 판(폰 안에서만, 통계용 접속당 1번)
       u.gmBot = 1; day.gmb = (day.gmb || 0) + 1;
+    } else if (m.t === "fs" && Number.isInteger(m.k) && m.k >= 1 && m.k <= 5) {   // 🧭 처음 1분(first.js): 1 보임·2 첫 물고기·3 폭죽·4 끝까지·5 친구 부르기(접속당 단계별 1번)
+      u.fs = u.fs || 0; const bit = 1 << m.k; if (u.fs & bit) return; u.fs |= bit;
+      day.fs = day.fs || [0, 0, 0, 0, 0]; day.fs[m.k - 1]++;
     } else if (m.t === "ms" && !u.ms) {   // ✅ 오늘 밤 할 일 3개를 다 함(mission.js, 접속당 1번)
       u.ms = 1; day.ms = (day.ms || 0) + 1;
     } else if (m.t === "fbDone" && u.admin && typeof m.what === "string") {
